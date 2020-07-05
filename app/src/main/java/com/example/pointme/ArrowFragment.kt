@@ -12,6 +12,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,6 +52,8 @@ class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
 
     override fun onResume() {
         super.onResume()
+
+        setupHyperlink()
 
         image = view!!.findViewById(R.id.pointer_arrow) as ImageView
         destinationHeading = view!!.findViewById(R.id.heading_destination) as TextView
@@ -120,6 +123,11 @@ class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
     override fun onProviderEnabled(p0: String?) {}
 
     override fun onProviderDisabled(p0: String?) {}
+
+    private fun setupHyperlink() {
+        val linkTextView: TextView = view!!.findViewById(R.id.footer_attribution)
+        linkTextView.movementMethod = LinkMovementMethod.getInstance()
+    }
 
     @SuppressLint("MissingPermission")
     private fun requestLocationUpdates(){

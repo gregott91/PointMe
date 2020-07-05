@@ -18,4 +18,6 @@
     <string name="heading_distance">%1$s %2$s remaining</string>
     <string name="heading_direction">Destination is %1$s</string>
     <string name="title_activity_plz_remove">PlzRemove</string>
+
+    <string name="attribution_hyperlink"><a href="https://www.flaticon.com/authors/kiranshastry">Arrow icon from kiranshastry</a></string>
 </resources>

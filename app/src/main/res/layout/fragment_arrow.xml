@@ -14,6 +14,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="5dp"
         android:layout_marginTop="20dp"
+        style="@style/HeaderText"
         android:text="Calculating destination..." />
 
     <TextView
@@ -23,6 +24,7 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/heading_destination"
         android:layout_marginBottom="5dp"
+        style="@style/HeaderText"
         android:text="Calculating distance..." />
 
     <TextView
@@ -32,6 +34,7 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/heading_distance"
         android:layout_marginBottom="40dp"
+        style="@style/HeaderText"
         android:text="Calculating direction..."/>
 
     <ImageView
@@ -43,4 +46,15 @@
         android:layout_marginRight="15dp"
         android:layout_centerHorizontal="true"
         android:src="@drawable/arrow" />
+
+    <TextView
+        android:id="@+id/footer_attribution"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/pointer_arrow"
+        android:layout_marginTop="40dp"
+        android:text="@string/attribution_hyperlink"
+        style="@style/FooterText"
+        android:textAlignment="center"/>
 </RelativeLayout>
