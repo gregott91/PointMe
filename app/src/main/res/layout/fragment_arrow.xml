@@ -16,7 +16,7 @@
         android:layout_marginTop="20dp" />
 
     <ImageView
-        android:id="@+id/imageViewCompass"
+        android:id="@+id/pointer_arrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/heading_distance"

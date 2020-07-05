@@ -1,6 +1,9 @@
 package com.example.pointme
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -16,15 +19,19 @@ import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import kotlin.math.*
+import kotlin.math.acos
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
 class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
     private var image: ImageView? = null
     private var distanceHeading: TextView? = null
 
-    private var mSensorManager: SensorManager? = null
-    private var mLocationManager: LocationManager? = null
+    private lateinit var mSensorManager: SensorManager
+    private lateinit var mLocationManager: LocationManager
 
     private var curDegree: Float? = null
     private var prevDegree: Float = 0f
@@ -44,7 +51,7 @@ class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
     override fun onResume() {
         super.onResume()
 
-        image = view!!.findViewById(R.id.imageViewCompass) as ImageView
+        image = view!!.findViewById(R.id.pointer_arrow) as ImageView
         distanceHeading = view!!.findViewById(R.id.heading_distance) as TextView
         mSensorManager = activity!!.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         mLocationManager = activity!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -54,21 +61,40 @@ class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
         destLon = extras.getDouble(EXTRA_LNG)
 
         // for the system's orientation sensor registered listeners
-        mSensorManager!!.registerListener(
-            this, mSensorManager!!.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+        mSensorManager.registerListener(
+            this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
             SensorManager.SENSOR_DELAY_GAME
         )
 
-        var gpsEnabled = mLocationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        // todo check for permission yo
-        mLocationManager!!.requestLocationUpdates(LocationManager.GPS_PROVIDER, 250, 0.5f, this)
+        val permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+
+        if (!hasPermissions(permissions)) {
+            ActivityCompat.requestPermissions(activity!!, permissions, GPS_PERMISSION_CODE)
+        } else {
+            requestLocationUpdates()
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        // Checking whether user granted the permission or not.
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            requestLocationUpdates()
+        } else {
+            // todo handle this case
+        }
     }
 
     override fun onPause() {
         super.onPause()
 
         // to stop the listener and save battery
-        mSensorManager!!.unregisterListener(this)
+        mSensorManager.unregisterListener(this)
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
@@ -92,6 +118,27 @@ class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
 
     override fun onProviderDisabled(p0: String?) {}
 
+    @SuppressLint("MissingPermission")
+    private fun requestLocationUpdates(){
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 250, 0.5f, this)
+
+        var location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+        curLat = location.latitude
+        curLon = location.longitude
+    }
+
+    private fun hasPermissions(permissions: Array<String>): Boolean {
+        permissions.forEach { permission ->
+            val result = ActivityCompat.checkSelfPermission(activity!!, permission)
+
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                return false
+            }
+        }
+
+        return true
+    }
+
     private fun rotateImage() {
         val curDegreeSnapshot: Float? = curDegree
         val curLatSnapshot: Double? = curLat
@@ -109,15 +156,20 @@ class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
         val units: String
 
         if (distance > 5280){
-            finalDistance = "%.2f".format(distance)
-            units = "feet"
-        } else {
-            finalDistance = "%.0f".format(distance / 5280)
+            finalDistance = "%.2f".format(distance / 5280)
             units = "miles"
+        } else {
+            finalDistance = "%.0f".format(distance)
+            units = "feet"
         }
 
-        distanceHeading!!.text = String.format(resources.getString(R.string.heading_distance), finalDistance, units)
-
+        try {
+            distanceHeading!!.text =
+                String.format(resources.getString(R.string.heading_distance), finalDistance, units)
+        } catch (ex: IllegalStateException) {
+            // todo log this
+            return
+        }
         // create a rotation animation (reverse turn degree degrees)
         val ra = RotateAnimation(
             prevDegree,
