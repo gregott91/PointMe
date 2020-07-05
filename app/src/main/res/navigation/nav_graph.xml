@@ -8,21 +8,19 @@
     <fragment
         android:id="@+id/LocationFragment"
         android:name="com.example.pointme.LocationFragment"
-        android:label="@string/first_fragment_label"
         tools:layout="@layout/fragment_location">
 
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
+            android:id="@+id/action_location_to_arrow"
             app:destination="@id/ArrowFragment" />
     </fragment>
     <fragment
         android:id="@+id/ArrowFragment"
         android:name="com.example.pointme.ArrowFragment"
-        android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_arrow">
 
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
+            android:id="@+id/action_arrow_to_location"
             app:destination="@id/LocationFragment" />
     </fragment>
 </navigation>

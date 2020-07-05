@@ -24,6 +24,4 @@
     <style name="FooterText" parent="TextAppearance.AppCompat">
         <item name="android:textSize">12dp</item>
     </style>
-
-
 </resources>

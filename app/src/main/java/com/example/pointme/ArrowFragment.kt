@@ -18,10 +18,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import kotlin.math.*
 
 class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
@@ -61,6 +63,11 @@ class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
         directionHeading = view!!.findViewById(R.id.heading_direction) as TextView
         mSensorManager = activity!!.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         mLocationManager = activity!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        var button = activity!!.findViewById(R.id.arrival_button) as Button
+        button.setOnClickListener {
+            findNavController().navigate(R.id.action_arrow_to_location)
+        }
 
         destLat = arguments?.getDouble(EXTRA_LAT)!!
         destLon = arguments?.getDouble(EXTRA_LNG)!!

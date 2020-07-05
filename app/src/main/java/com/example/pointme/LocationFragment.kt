@@ -1,6 +1,5 @@
 package com.example.pointme
 
-import android.content.Intent
 import android.location.Address
 import android.location.Geocoder
 import android.os.Bundle
@@ -8,7 +7,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.common.api.Status
@@ -66,6 +64,6 @@ class LocationFragment : Fragment() {
             EXTRA_LNG to address.longitude,
             EXTRA_DEST to placeName)
 
-        findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment, bundle)
+        findNavController().navigate(R.id.action_location_to_arrow, bundle)
     }
 }
