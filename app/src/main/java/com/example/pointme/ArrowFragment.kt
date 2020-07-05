@@ -59,10 +59,9 @@ class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
         mSensorManager = activity!!.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         mLocationManager = activity!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-        val extras = activity!!.intent.extras!!
-        destLat = extras.getDouble(EXTRA_LAT)
-        destLon = extras.getDouble(EXTRA_LNG)
-        destName = extras.getString(EXTRA_DEST)
+        destLat = arguments?.getDouble(EXTRA_LAT)!!
+        destLon = arguments?.getDouble(EXTRA_LNG)!!
+        destName = arguments?.getString(EXTRA_DEST)!!
 
         // for the system's orientation sensor registered listeners
         mSensorManager.registerListener(
