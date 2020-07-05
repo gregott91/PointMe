@@ -13,7 +13,8 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="5dp"
-        android:layout_marginTop="20dp" />
+        android:layout_marginTop="20dp"
+        android:text="Calculating destination..." />
 
     <TextView
         android:id="@+id/heading_distance"
@@ -21,7 +22,8 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/heading_destination"
-        android:layout_marginBottom="5dp" />
+        android:layout_marginBottom="5dp"
+        android:text="Calculating distance..." />
 
     <TextView
         android:id="@+id/heading_direction"
@@ -29,15 +31,16 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/heading_distance"
-        android:layout_marginBottom="40dp" />
+        android:layout_marginBottom="40dp"
+        android:text="Calculating direction..."/>
 
     <ImageView
         android:id="@+id/pointer_arrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/heading_direction"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
         android:layout_centerHorizontal="true"
         android:src="@drawable/arrow" />
 </RelativeLayout>
