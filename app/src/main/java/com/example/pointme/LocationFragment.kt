@@ -43,7 +43,7 @@ class LocationFragment : Fragment() {
         val geocoder = Geocoder(activity!!, Locale.getDefault())
 
         val autocompleteFragment =
-            activity!!.supportFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment
+            childFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment
 
         autocompleteFragment.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME))
         autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
