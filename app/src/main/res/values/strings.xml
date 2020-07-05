@@ -11,9 +11,10 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 
-    <string name="api_key">REPLACEME</string>
     <string name="title_activity_pointer">PointerActivity</string>
     <string name="title_activity_main2">MainActivity</string>
 
-    <string name="heading_distance">Remaining distance: %1$s %2$s</string>
+    <string name="heading_destination">Navigating to %1$s</string>
+    <string name="heading_distance">%1$s %2$s remaining</string>
+    <string name="heading_direction">Destination is %1$s</string>
 </resources>

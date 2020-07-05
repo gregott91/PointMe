@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
                 val addresses: List<Address> =
                     geocoder.getFromLocationName(place.name, 1)
 
-                navToPointer(addresses[0])
+                navToPointer(addresses[0], place.name!!)
             }
 
             override fun onError(status: Status) {
@@ -66,10 +66,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun navToPointer(address: Address) {
+    fun navToPointer(address: Address, placeName: String) {
         val intent = Intent(this, PointerActivity::class.java).apply {
             putExtra(EXTRA_LAT, address.latitude)
             putExtra(EXTRA_LNG, address.longitude)
+            putExtra(EXTRA_DEST, placeName)
         }
         startActivity(intent)
     }

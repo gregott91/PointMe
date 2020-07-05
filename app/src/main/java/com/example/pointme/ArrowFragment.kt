@@ -21,14 +21,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import kotlin.math.acos
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
+import kotlin.math.*
 
 class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
     private var image: ImageView? = null
+    private var destinationHeading: TextView? = null
     private var distanceHeading: TextView? = null
+    private var directionHeading: TextView? = null
 
     private lateinit var mSensorManager: SensorManager
     private lateinit var mLocationManager: LocationManager
@@ -39,6 +38,8 @@ class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
     private var destLon: Double = 0.0
     private var curLat: Double? = null
     private var curLon: Double? = null
+
+    private var destName: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,13 +53,16 @@ class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
         super.onResume()
 
         image = view!!.findViewById(R.id.pointer_arrow) as ImageView
+        destinationHeading = view!!.findViewById(R.id.heading_destination) as TextView
         distanceHeading = view!!.findViewById(R.id.heading_distance) as TextView
+        directionHeading = view!!.findViewById(R.id.heading_direction) as TextView
         mSensorManager = activity!!.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         mLocationManager = activity!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         val extras = activity!!.intent.extras!!
         destLat = extras.getDouble(EXTRA_LAT)
         destLon = extras.getDouble(EXTRA_LNG)
+        destName = extras.getString(EXTRA_DEST)
 
         // for the system's orientation sensor registered listeners
         mSensorManager.registerListener(
@@ -122,7 +126,7 @@ class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
     private fun requestLocationUpdates(){
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 250, 0.5f, this)
 
-        var location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+        val location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)!!
         curLat = location.latitude
         curLon = location.longitude
     }
@@ -163,9 +167,22 @@ class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
             units = "feet"
         }
 
+        var direction: String? = null
+        when ((angle / 45.0).roundToInt()) {
+            0,8 -> direction = "N"
+            1 -> direction = "NE"
+            2 -> direction = "E"
+            3 -> direction = "SE"
+            4 -> direction = "S"
+            5 -> direction = "SW"
+            6 -> direction = "W"
+            7 -> direction = "NW"
+        }
+
         try {
-            distanceHeading!!.text =
-                String.format(resources.getString(R.string.heading_distance), finalDistance, units)
+            destinationHeading!!.text = String.format(resources.getString(R.string.heading_destination), destName)
+            distanceHeading!!.text = String.format(resources.getString(R.string.heading_distance), finalDistance, units)
+            directionHeading!!.text = String.format(resources.getString(R.string.heading_direction), direction!!)
         } catch (ex: IllegalStateException) {
             // todo log this
             return
