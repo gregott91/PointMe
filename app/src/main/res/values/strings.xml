@@ -17,4 +17,5 @@
     <string name="heading_destination">Navigating to %1$s</string>
     <string name="heading_distance">%1$s %2$s remaining</string>
     <string name="heading_direction">Destination is %1$s</string>
+    <string name="title_activity_plz_remove">PlzRemove</string>
 </resources>

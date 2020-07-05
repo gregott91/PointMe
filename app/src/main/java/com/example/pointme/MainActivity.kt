@@ -22,36 +22,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
-
-        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }
-
-        val apiKey = getString(R.string.api_key)
-
-        if (!Places.isInitialized()) {
-            Places.initialize(applicationContext, apiKey)
-        }
-
-        val geocoder = Geocoder(this, Locale.getDefault())
-
-        val autocompleteFragment =
-            supportFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment
-
-        autocompleteFragment.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME))
-        autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
-            override fun onPlaceSelected(place: Place) {
-                val addresses: List<Address> =
-                    geocoder.getFromLocationName(place.name, 1)
-
-                navToPointer(addresses[0], place.name!!)
-            }
-
-            override fun onError(status: Status) {
-                // todo improve error handling
-            }
-        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -64,14 +34,5 @@ class MainActivity : AppCompatActivity() {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
         }
-    }
-
-    fun navToPointer(address: Address, placeName: String) {
-        val intent = Intent(this, PointerActivity::class.java).apply {
-            putExtra(EXTRA_LAT, address.latitude)
-            putExtra(EXTRA_LNG, address.longitude)
-            putExtra(EXTRA_DEST, placeName)
-        }
-        startActivity(intent)
     }
 }
