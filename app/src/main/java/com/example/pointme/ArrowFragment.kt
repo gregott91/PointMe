@@ -5,14 +5,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.location.Location
-import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,9 +21,15 @@ import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.example.pointme.listeners.GpsLocationListener
+import com.example.pointme.listeners.SensorListener
+import com.example.pointme.managers.PositionManager
+import com.example.pointme.models.Coordinate
+import com.example.pointme.repositories.PositionRepository
+import java.util.*
 import kotlin.math.*
 
-class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
+class ArrowFragment : Fragment() {
     private var image: ImageView? = null
     private var destinationHeading: TextView? = null
     private var distanceHeading: TextView? = null
@@ -35,14 +38,11 @@ class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
     private lateinit var mSensorManager: SensorManager
     private lateinit var mLocationManager: LocationManager
 
-    private var curDegree: Float? = null
     private var prevDegree: Float = 0f
-    private var destLat: Double = 0.0
-    private var destLon: Double = 0.0
-    private var curLat: Double? = null
-    private var curLon: Double? = null
 
-    private var destName: String? = null
+    private var mPositionManager = PositionManager(PositionRepository())
+    private var mSensorListener = SensorListener(mPositionManager, { rotateImage() })
+    private var mLocationListener = GpsLocationListener(mPositionManager, { rotateImage() })
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,20 +64,23 @@ class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
         mSensorManager = activity!!.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         mLocationManager = activity!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-        var button = activity!!.findViewById(R.id.arrival_button) as Button
+        val button = activity!!.findViewById(R.id.arrival_button) as Button
         button.setOnClickListener {
             findNavController().navigate(R.id.action_arrow_to_location)
         }
 
-        destLat = arguments?.getDouble(EXTRA_LAT)!!
-        destLon = arguments?.getDouble(EXTRA_LNG)!!
-        destName = arguments?.getString(EXTRA_DEST)!!
+        val destLat = arguments?.getDouble(EXTRA_LAT)!!
+        val destLon = arguments?.getDouble(EXTRA_LNG)!!
+        mPositionManager.setDestinationCoordinates(Coordinate(destLat, destLon))
+
+        val destName = arguments?.getString(EXTRA_DEST)!!
+        destinationHeading!!.text = String.format(resources.getString(R.string.heading_destination), destName)
 
         // for the system's orientation sensor registered listeners
         mSensorManager.registerListener(
-            this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
-            SensorManager.SENSOR_DELAY_GAME
-        )
+            mSensorListener,
+            mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+            SensorManager.SENSOR_DELAY_GAME)
 
         val permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
 
@@ -98,8 +101,6 @@ class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
         // Checking whether user granted the permission or not.
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             requestLocationUpdates()
-        } else {
-            // todo handle this case
         }
     }
 
@@ -107,29 +108,8 @@ class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
         super.onPause()
 
         // to stop the listener and save battery
-        mSensorManager.unregisterListener(this)
+        mSensorManager.unregisterListener(mSensorListener)
     }
-
-    override fun onSensorChanged(event: SensorEvent?) {
-        curDegree = -(event!!.values[0])
-
-        rotateImage()
-    }
-
-    override fun onLocationChanged(event: Location) {
-        curLat = event.latitude
-        curLon = event.longitude
-
-        rotateImage()
-    }
-
-    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {}
-
-    override fun onStatusChanged(p0: String?, p1: Int, p2: Bundle?) {}
-
-    override fun onProviderEnabled(p0: String?) {}
-
-    override fun onProviderDisabled(p0: String?) {}
 
     private fun setupHyperlink() {
         val linkTextView: TextView = view!!.findViewById(R.id.footer_attribution)
@@ -138,11 +118,10 @@ class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
 
     @SuppressLint("MissingPermission")
     private fun requestLocationUpdates(){
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 250, 0.5f, this)
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 250, 0.5f, mLocationListener)
 
         val location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)!!
-        curLat = location.latitude
-        curLon = location.longitude
+        mPositionManager.setCurrentCoordinates(Coordinate(location.latitude, location.longitude))
     }
 
     private fun hasPermissions(permissions: Array<String>): Boolean {
@@ -158,16 +137,18 @@ class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
     }
 
     private fun rotateImage() {
-        val curDegreeSnapshot: Float? = curDegree
-        val curLatSnapshot: Double? = curLat
-        val curLonSnapshot: Double? = curLon
+        val currentLocation = mPositionManager.getCurrentLocation()
+        val curDegreeSnapshot: Float? = currentLocation.heading
+        val curLatSnapshot: Double? = currentLocation.coordinate?.latitude
+        val curLonSnapshot: Double? = currentLocation.coordinate?.longitude
+        val destCoordinates = mPositionManager.getDestinationCoordinates()!!
 
         if (curDegreeSnapshot == null || curLatSnapshot == null || curLonSnapshot == null) {
             return
         }
 
-        val distance = distanceFromCoordinates(curLatSnapshot, curLonSnapshot, destLat, destLon)
-        val angle = angleFromCoordinate(curLatSnapshot, curLonSnapshot, destLat, destLon)
+        val distance = distanceFromCoordinates(curLatSnapshot, curLonSnapshot, destCoordinates.latitude, destCoordinates.longitude)
+        val angle = angleFromCoordinate(curLatSnapshot, curLonSnapshot, destCoordinates.latitude, destCoordinates.longitude)
         val angleToPoint = (angle + curDegreeSnapshot).toFloat()
 
         val finalDistance: String
@@ -194,7 +175,6 @@ class ArrowFragment : Fragment(), SensorEventListener, LocationListener {
         }
 
         try {
-            destinationHeading!!.text = String.format(resources.getString(R.string.heading_destination), destName)
             distanceHeading!!.text = String.format(resources.getString(R.string.heading_distance), finalDistance, units)
             directionHeading!!.text = String.format(resources.getString(R.string.heading_direction), direction!!)
         } catch (ex: IllegalStateException) {

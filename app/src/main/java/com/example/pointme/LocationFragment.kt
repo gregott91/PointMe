@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
+import com.example.pointme.listeners.DestinationSelectionListener
 import com.google.android.gms.common.api.Status
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
@@ -38,32 +39,10 @@ class LocationFragment : Fragment() {
             Places.initialize(activity!!.applicationContext, apiKey)
         }
 
-        val geocoder = Geocoder(activity!!, Locale.getDefault())
-
         val autocompleteFragment =
             childFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment
 
         autocompleteFragment.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME))
-        autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
-            override fun onPlaceSelected(place: Place) {
-                val addresses: List<Address> =
-                    geocoder.getFromLocationName(place.name, 1)
-
-                navToPointer(addresses[0], place.name!!)
-            }
-
-            override fun onError(status: Status) {
-                // todo improve error handling
-            }
-        })
-    }
-
-    fun navToPointer(address: Address, placeName: String) {
-        val bundle = bundleOf(
-            EXTRA_LAT to address.latitude,
-            EXTRA_LNG to address.longitude,
-            EXTRA_DEST to placeName)
-
-        findNavController().navigate(R.id.action_location_to_arrow, bundle)
+        autocompleteFragment.setOnPlaceSelectedListener(DestinationSelectionListener(activity!!, findNavController()))
     }
 }

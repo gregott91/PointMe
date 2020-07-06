@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="#fff"
     tools:context=".ArrowFragment">
-
     <TextView
         android:id="@+id/heading_destination"
         android:layout_width="wrap_content"
