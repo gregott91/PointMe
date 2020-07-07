@@ -9,7 +9,6 @@ import android.hardware.SensorManager
 import android.location.LocationManager
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,13 +20,17 @@ import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.example.pointme.helpers.angleFromCoordinate
+import com.example.pointme.helpers.distanceFromCoordinates
+import com.example.pointme.helpers.getShortDirectionFromAngle
+import com.example.pointme.helpers.getUserReadableDistance
 import com.example.pointme.listeners.GpsLocationListener
 import com.example.pointme.listeners.SensorListener
+import com.example.pointme.managers.PermissionManager
 import com.example.pointme.managers.PositionManager
 import com.example.pointme.models.Coordinate
+import com.example.pointme.repositories.ActivityCompatRepository
 import com.example.pointme.repositories.PositionRepository
-import java.util.*
-import kotlin.math.*
 
 class ArrowFragment : Fragment() {
     private var image: ImageView? = null
@@ -40,6 +43,7 @@ class ArrowFragment : Fragment() {
 
     private var prevDegree: Float = 0f
 
+    private var mPermissionManager = PermissionManager(ActivityCompatRepository())
     private var mPositionManager = PositionManager(PositionRepository())
     private var mSensorListener = SensorListener(mPositionManager, { rotateImage() })
     private var mLocationListener = GpsLocationListener(mPositionManager, { rotateImage() })
@@ -83,10 +87,8 @@ class ArrowFragment : Fragment() {
             SensorManager.SENSOR_DELAY_GAME)
 
         val permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
-
-        if (!hasPermissions(permissions)) {
-            ActivityCompat.requestPermissions(activity!!, permissions, GPS_PERMISSION_CODE)
-        } else {
+        val hasAllPermissions = mPermissionManager.requestNeededPermissions(permissions, GPS_PERMISSION_CODE, activity!!)
+        if (hasAllPermissions) {
             requestLocationUpdates()
         }
     }
@@ -124,59 +126,41 @@ class ArrowFragment : Fragment() {
         mPositionManager.setCurrentCoordinates(Coordinate(location.latitude, location.longitude))
     }
 
-    private fun hasPermissions(permissions: Array<String>): Boolean {
-        permissions.forEach { permission ->
-            val result = ActivityCompat.checkSelfPermission(activity!!, permission)
-
-            if (result != PackageManager.PERMISSION_GRANTED) {
-                return false
-            }
-        }
-
-        return true
-    }
-
     private fun rotateImage() {
         val currentLocation = mPositionManager.getCurrentLocation()
         val curDegreeSnapshot: Float? = currentLocation.heading
         val curLatSnapshot: Double? = currentLocation.coordinate?.latitude
         val curLonSnapshot: Double? = currentLocation.coordinate?.longitude
-        val destCoordinates = mPositionManager.getDestinationCoordinates()!!
 
         if (curDegreeSnapshot == null || curLatSnapshot == null || curLonSnapshot == null) {
             return
         }
 
-        val distance = distanceFromCoordinates(curLatSnapshot, curLonSnapshot, destCoordinates.latitude, destCoordinates.longitude)
-        val angle = angleFromCoordinate(curLatSnapshot, curLonSnapshot, destCoordinates.latitude, destCoordinates.longitude)
+        val destCoordinates = mPositionManager.getDestinationCoordinates()!!
+
+        val distance = distanceFromCoordinates(
+            curLatSnapshot,
+            curLonSnapshot,
+            destCoordinates.latitude,
+            destCoordinates.longitude
+        )
+        val angle = angleFromCoordinate(
+            curLatSnapshot,
+            curLonSnapshot,
+            destCoordinates.latitude,
+            destCoordinates.longitude
+        )
+
         val angleToPoint = (angle + curDegreeSnapshot).toFloat()
 
-        val finalDistance: String
-        val units: String
-
-        if (distance > 5280){
-            finalDistance = "%.2f".format(distance / 5280)
-            units = "miles"
-        } else {
-            finalDistance = "%.0f".format(distance)
-            units = "feet"
-        }
-
-        var direction: String? = null
-        when ((angle / 45.0).roundToInt()) {
-            0,8 -> direction = "N"
-            1 -> direction = "NE"
-            2 -> direction = "E"
-            3 -> direction = "SE"
-            4 -> direction = "S"
-            5 -> direction = "SW"
-            6 -> direction = "W"
-            7 -> direction = "NW"
-        }
+        val (finalDistance, units) = getUserReadableDistance(distance)
+        var direction: String? = getShortDirectionFromAngle(angle)
 
         try {
-            distanceHeading!!.text = String.format(resources.getString(R.string.heading_distance), finalDistance, units)
-            directionHeading!!.text = String.format(resources.getString(R.string.heading_direction), direction!!)
+            distanceHeading!!.text =
+                String.format(resources.getString(R.string.heading_distance), finalDistance, units)
+            directionHeading!!.text =
+                String.format(resources.getString(R.string.heading_direction), direction!!)
         } catch (ex: IllegalStateException) {
             // todo log this
             return
@@ -197,43 +181,5 @@ class ArrowFragment : Fragment() {
         ra.fillAfter = true
 
         image!!.startAnimation(ra)
-    }
-
-    private fun angleFromCoordinate(
-        startLat: Double,
-        startLon: Double,
-        endLat: Double,
-        endLon: Double
-    ): Double {
-        val dLon = endLon - startLon
-        val y = sin(dLon) * cos(endLat)
-        val x = cos(startLat) * sin(endLat) - (sin(startLat) * cos(endLat) * cos(dLon))
-        var brng = atan2(y, x)
-        brng = Math.toDegrees(brng)
-        brng = (brng + 360) % 360
-        brng = 360 - brng
-        return brng
-    }
-
-    private fun distanceFromCoordinates(
-        startLat: Double,
-        startLon: Double,
-        endLat: Double,
-        endLon: Double
-    ): Double {
-        val theta = startLon - endLon
-        var dist =
-            sin(Math.toRadians(startLat)) * sin(
-                Math.toRadians(endLat)
-            ) + cos(Math.toRadians(startLat)) * cos(
-                Math.toRadians(
-                    endLat
-                )
-            ) * cos(Math.toRadians(theta))
-        dist = acos(dist)
-        dist = Math.toDegrees(dist)
-        dist *= 60 * 1.1515
-
-        return dist * 5280
     }
 }
