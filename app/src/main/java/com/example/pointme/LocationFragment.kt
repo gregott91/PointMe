@@ -42,7 +42,7 @@ class LocationFragment : Fragment() {
         val autocompleteFragment =
             childFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment
 
-        autocompleteFragment.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME))
-        autocompleteFragment.setOnPlaceSelectedListener(DestinationSelectionListener(activity!!, findNavController()))
+        autocompleteFragment.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG))
+        autocompleteFragment.setOnPlaceSelectedListener(DestinationSelectionListener(findNavController()))
     }
 }
