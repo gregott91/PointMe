@@ -10,6 +10,8 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
 import com.example.pointme.listeners.DestinationSelectionListener
+import com.example.pointme.managers.DatabaseManager
+import com.example.pointme.managers.NavigationStartManager
 import com.google.android.gms.common.api.Status
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
@@ -33,6 +35,9 @@ class LocationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        var navigationStartManager = NavigationStartManager(
+            DatabaseManager().getDatabase(activity!!.applicationContext).navigationStartRepository())
+
         val apiKey = getString(R.string.api_key)
 
         if (!Places.isInitialized()) {
@@ -43,6 +48,6 @@ class LocationFragment : Fragment() {
             childFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment
 
         autocompleteFragment.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG))
-        autocompleteFragment.setOnPlaceSelectedListener(DestinationSelectionListener(findNavController()))
+        autocompleteFragment.setOnPlaceSelectedListener(DestinationSelectionListener(findNavController(), navigationStartManager))
     }
 }
