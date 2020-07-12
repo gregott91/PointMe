@@ -1,4 +1,4 @@
-package com.example.pointme.repositories
+package com.example.pointme.data.repositories
 
 import com.example.pointme.models.Coordinate
 

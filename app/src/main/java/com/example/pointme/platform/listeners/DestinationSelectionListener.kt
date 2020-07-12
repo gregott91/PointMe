@@ -1,8 +1,8 @@
-package com.example.pointme.listeners
+package com.example.pointme.platform.listeners
 
 import androidx.navigation.NavController
 import com.example.pointme.R
-import com.example.pointme.managers.NavigationStartManager
+import com.example.pointme.managers.NavigationRequestManager
 import com.google.android.gms.common.api.Status
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
@@ -10,9 +10,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
-class DestinationSelectionListener(controller: NavController, navigationStartManager: NavigationStartManager) : PlaceSelectionListener {
+class DestinationSelectionListener(controller: NavController, navigationStartManager: NavigationRequestManager) : PlaceSelectionListener {
     private val mController: NavController = controller
-    private val mNavigationStartManager: NavigationStartManager = navigationStartManager
+    private val mNavigationStartManager: NavigationRequestManager = navigationStartManager
 
     override fun onPlaceSelected(place: Place) {
         runBlocking {

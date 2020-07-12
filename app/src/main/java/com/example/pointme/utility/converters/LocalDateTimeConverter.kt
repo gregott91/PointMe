@@ -1,4 +1,4 @@
-package com.example.pointme.converters
+package com.example.pointme.utility.converters
 
 import android.os.Build
 import androidx.annotation.RequiresApi

@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
@@ -17,23 +18,24 @@ import android.view.animation.RotateAnimation
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.app.ActivityCompat
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.room.Database
-import com.example.pointme.helpers.angleFromCoordinate
-import com.example.pointme.helpers.distanceFromCoordinates
-import com.example.pointme.helpers.getShortDirectionFromAngle
-import com.example.pointme.helpers.getUserReadableDistance
-import com.example.pointme.listeners.GpsLocationListener
-import com.example.pointme.listeners.SensorListener
+import com.example.pointme.utility.helpers.angleFromCoordinate
+import com.example.pointme.utility.helpers.distanceFromCoordinates
+import com.example.pointme.utility.helpers.getShortDirectionFromAngle
+import com.example.pointme.utility.helpers.getUserReadableDistance
+import com.example.pointme.platform.listeners.GpsLocationListener
+import com.example.pointme.platform.listeners.SensorListener
 import com.example.pointme.managers.*
 import com.example.pointme.models.Coordinate
-import com.example.pointme.repositories.ActivityCompatRepository
-import com.example.pointme.repositories.PositionRepository
+import com.example.pointme.data.repositories.ActivityCompatRepository
+import com.example.pointme.data.repositories.PositionRepository
+import com.example.pointme.models.entities.NavigationOperation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
 
 class ArrowFragment : Fragment() {
     private var image: ImageView? = null
@@ -49,7 +51,7 @@ class ArrowFragment : Fragment() {
     private var mPermissionManager: PermissionManager? = null
     private var mPositionManager: PositionManager? = null
     private var mNavigationOperationManager: NavigationOperationManager? = null
-    private var mNavigationStartManager: NavigationStartManager? = null
+    private var mNavigationRequestManager: NavigationRequestManager? = null
     private var mSensorListener: SensorListener? = null
     private var mLocationListener: GpsLocationListener? = null
 
@@ -61,6 +63,7 @@ class ArrowFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_arrow, container, false)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
         super.onResume()
 
@@ -72,13 +75,19 @@ class ArrowFragment : Fragment() {
 
         runBlocking {
             withContext(Dispatchers.IO) {
-                val nav = mNavigationStartManager!!.getActiveNavigation();
+                val request = mNavigationRequestManager!!.getActiveNavigation();
 
-                val destLat = nav.latitude
-                val destLon = nav.longitude
+                var operation = mNavigationOperationManager!!.getByRequest(request)
+                if (operation == null) {
+                    operation = NavigationOperation(LocalDateTime.now(), 3.0, request.place_name, true, request.id)
+                    mNavigationOperationManager!!.insert(operation)
+                }
+
+                val destLat = request.latitude
+                val destLon = request.longitude
                 mPositionManager?.setDestinationCoordinates(Coordinate(destLat, destLon))
 
-                val destName = nav.place_name
+                val destName = request.place_name
                 destinationHeading!!.text = String.format(resources.getString(R.string.heading_destination), destName)
             }
         }
@@ -134,14 +143,14 @@ class ArrowFragment : Fragment() {
         mPositionManager = PositionManager(PositionRepository())
         mNavigationOperationManager = NavigationOperationManager(
             DatabaseManager().getDatabase(activity!!.applicationContext).navigationOperationRepository())
-        mNavigationStartManager = NavigationStartManager(
+        mNavigationRequestManager = NavigationRequestManager(
             DatabaseManager().getDatabase(activity!!.applicationContext).navigationStartRepository())
 
         mSensorListener = SensorListener(mPositionManager!!, { rotateImage() })
         mLocationListener = GpsLocationListener(mPositionManager!!, { rotateImage() })
     }
 
-    fun initViewElements() {
+    private fun initViewElements() {
         image = view!!.findViewById(R.id.pointer_arrow) as ImageView
         destinationHeading = view!!.findViewById(R.id.heading_destination) as TextView
         distanceHeading = view!!.findViewById(R.id.heading_distance) as TextView

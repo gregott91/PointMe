@@ -3,7 +3,7 @@ package com.example.pointme.managers
 import android.content.Context
 import androidx.room.Room
 import com.example.pointme.DATABASE_NAME
-import com.example.pointme.databases.AppDatabase
+import com.example.pointme.data.databases.AppDatabase
 
 class DatabaseManager {
     private companion object {
@@ -16,7 +16,7 @@ class DatabaseManager {
                 context,
                 AppDatabase::class.java,
                 DATABASE_NAME
-            ).build()
+            ).fallbackToDestructiveMigration().build()
         }
 
         return database!!

@@ -1,4 +1,4 @@
-package com.example.pointme.repositories
+package com.example.pointme.data.repositories
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -10,6 +10,12 @@ import com.example.pointme.models.entities.NavigationOperation
 interface NavigationOperationRepository {
     @Query("SELECT * FROM NavigationOperation WHERE id = :id")
     suspend fun getById(id: Int): NavigationOperation
+
+    @Query("SELECT * FROM NavigationOperation WHERE request_id = :id")
+    suspend fun getByRequestId(id: Int): NavigationOperation
+
+    @Query("SELECT * FROM NavigationOperation ORDER BY id DESC LIMIT :limit")
+    suspend fun getMostRecent(limit: Int): Array<NavigationOperation>
 
     @Insert
     suspend fun insert(operation: NavigationOperation)

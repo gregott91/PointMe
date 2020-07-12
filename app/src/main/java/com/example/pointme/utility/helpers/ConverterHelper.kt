@@ -1,4 +1,4 @@
-package com.example.pointme.helpers
+package com.example.pointme.utility.helpers
 
 import kotlin.math.roundToInt
 

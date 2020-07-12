@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class NavigationStart (
+data class NavigationRequest (
     @ColumnInfo(name = "place_name") var place_name: String,
     @ColumnInfo(name = "latitude") var latitude: Double,
     @ColumnInfo(name = "longitude") var longitude: Double
