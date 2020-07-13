@@ -10,6 +10,7 @@
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        HeaderText
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
@@ -23,5 +24,27 @@
 
     <style name="FooterText" parent="TextAppearance.AppCompat">
         <item name="android:textSize">12dp</item>
+    </style>
+
+    <style name="PreviousActivitiesHeader">
+        <item name="android:layout_marginTop">35dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:layout_marginLeft">20dp</item>
+        <item name="android:textColor">@color/quantum_black_100</item>
+        <item name="android:textSize">14dp</item>
+    </style>
+
+    <style name="PreviousActivitiesPlaceName">
+        <item name="android:layout_marginTop">15dp</item>
+        <item name="android:layout_marginLeft">20dp</item>
+        <item name="android:textColor">@color/quantum_black_100</item>
+        <item name="android:textSize">18dp</item>
+    </style>
+
+    <style name="PreviousActivitiesSubPlaceName">
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:layout_marginLeft">20dp</item>
+        <item name="android:textColor">@color/quantum_grey700</item>
+        <item name="android:textSize">14dp</item>
     </style>
 </resources>

@@ -9,7 +9,7 @@ import com.example.pointme.models.entities.NavigationRequest
 import com.example.pointme.data.repositories.NavigationOperationRepository
 import com.example.pointme.data.repositories.NavigationStartRepository
 
-@Database(entities = [NavigationOperation::class, NavigationRequest::class], version = 2)
+@Database(entities = [NavigationOperation::class, NavigationRequest::class], version = 3)
 @TypeConverters(LocalDateTimeConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun navigationOperationRepository(): NavigationOperationRepository

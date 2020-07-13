@@ -15,7 +15,7 @@ interface NavigationOperationRepository {
     suspend fun getByRequestId(id: Int): NavigationOperation
 
     @Query("SELECT * FROM NavigationOperation ORDER BY id DESC LIMIT :limit")
-    suspend fun getMostRecent(limit: Int): Array<NavigationOperation>
+    suspend fun getCompleted(limit: Int): Array<NavigationOperation>
 
     @Insert
     suspend fun insert(operation: NavigationOperation)

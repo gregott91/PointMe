@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.pointme.managers.CoroutineRunner
 import com.example.pointme.platform.listeners.DestinationSelectionListener
 import com.example.pointme.managers.DatabaseManager
 import com.example.pointme.managers.NavigationOperationManager
@@ -28,6 +29,7 @@ class LocationFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
+    private var coroutineRunner: CoroutineRunner = CoroutineRunner()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,16 +49,18 @@ class LocationFragment : Fragment() {
 
         initializePlaces()
 
-        runBlocking {
-            withContext(Dispatchers.IO) {
-                viewManager = LinearLayoutManager(activity!!)
-                viewAdapter = NavigationAdapter(operationManager.getLastSessions(DEFAULT_SESSION_LIMIT))
+        coroutineRunner.run {
+            operationManager.deactivateAllSessions()
 
-                recyclerView = activity!!.findViewById<RecyclerView>(R.id.previous_activities).apply {
-                    setHasFixedSize(true)
-                    layoutManager = viewManager
-                    adapter = viewAdapter
-                }
+            var sessions = operationManager.getLastSessions(DEFAULT_SESSION_LIMIT)
+
+            viewManager = LinearLayoutManager(activity!!)
+            viewAdapter = NavigationAdapter(sessions, activity!!)
+
+            recyclerView = activity!!.findViewById<RecyclerView>(R.id.previous_activities).apply {
+                setHasFixedSize(true)
+                layoutManager = viewManager
+                adapter = viewAdapter
             }
         }
 
