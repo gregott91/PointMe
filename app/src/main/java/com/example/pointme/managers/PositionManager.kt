@@ -2,7 +2,7 @@ package com.example.pointme.managers
 
 import com.example.pointme.models.Location
 import com.example.pointme.models.Coordinate
-import com.example.pointme.repositories.PositionRepository
+import com.example.pointme.data.repositories.PositionRepository
 
 class PositionManager(positionRepository: PositionRepository) {
     private var mPositionRepository: PositionRepository = positionRepository

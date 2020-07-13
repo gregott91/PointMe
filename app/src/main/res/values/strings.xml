@@ -7,11 +7,12 @@
     <string name="heading_destination">Navigating to %1$s</string>
     <string name="heading_distance">%1$s %2$s remaining</string>
     <string name="heading_direction">Destination is %1$s</string>
-    <string name="title_activity_plz_remove">PlzRemove</string>
 
     <string name="attribution_hyperlink"><a href="https://www.flaticon.com/authors/kiranshastry">Arrow icon from kiranshastry</a></string>
     <string name="init_heading_destination">Calculating destination...</string>
     <string name="init_heading_distance">Calculating distance...</string>
     <string name="init_heading_direction">Calculating direction...</string>
     <string name="arrival_button">I\'ve arrived!</string>
+    <string name="previous_activities_header">Previous Activities</string>
+    <string name="place_name_subheader">%1$s - %2$s %3$s</string>
 </resources>

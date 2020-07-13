@@ -1,4 +1,4 @@
-package com.example.pointme.listeners
+package com.example.pointme.platform.listeners
 
 import android.location.Location
 import android.location.LocationListener

@@ -1,7 +1,7 @@
 package com.example.pointme.managers
 
 import android.app.Activity
-import com.example.pointme.repositories.ActivityCompatRepository
+import com.example.pointme.data.repositories.ActivityCompatRepository
 
 class PermissionManager(activityCompatRepository: ActivityCompatRepository) {
     private var mActivityCompatRepository: ActivityCompatRepository = activityCompatRepository

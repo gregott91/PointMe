@@ -1,9 +1,8 @@
-package com.example.pointme.repositories
+package com.example.pointme.data.repositories
 
 import android.app.Activity
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
-import com.example.pointme.GPS_PERMISSION_CODE
 
 class ActivityCompatRepository {
     fun hasPermission(permission: String, activity: Activity): Boolean {
