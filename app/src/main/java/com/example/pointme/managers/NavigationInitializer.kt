@@ -35,19 +35,12 @@ class NavigationInitializer(
 
     @RequiresApi(Build.VERSION_CODES.O)
     private suspend fun writeNewOperation(currentLocation: Location, request: NavigationRequest): NavigationOperation {
-        val distance = distanceFromCoordinates(
-            currentLocation.latitude,
-            currentLocation.longitude,
-            request.latitude,
-            request.longitude
-        )
-
         var directionInfo = getDirectionInfo(
             Coordinate(currentLocation.latitude, currentLocation.longitude),
             Coordinate(request.latitude, request.longitude)
         )
 
-        var readableDistance = directionInfo.distance + " " + directionInfo.units
+        var readableDistance = "${directionInfo.distance} ${directionInfo.units}"
 
         var operation = NavigationOperation(LocalDateTime.now(), readableDistance, directionInfo.direction, request.place_name, true, request.id)
         operationManager!!.insert(operation)
