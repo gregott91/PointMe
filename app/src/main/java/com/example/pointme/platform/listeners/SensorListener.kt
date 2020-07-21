@@ -3,7 +3,7 @@ package com.example.pointme.platform.listeners
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
-import com.example.pointme.managers.PositionManager
+import com.example.pointme.logic.PositionManager
 
 class SensorListener(positionManager: PositionManager, callback: () -> Unit) : SensorEventListener {
     private var mPositionManager: PositionManager = positionManager

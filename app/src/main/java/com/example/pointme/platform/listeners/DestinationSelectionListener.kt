@@ -2,7 +2,7 @@ package com.example.pointme.platform.listeners
 
 import androidx.navigation.NavController
 import com.example.pointme.R
-import com.example.pointme.managers.NavigationRequestManager
+import com.example.pointme.logic.managers.NavigationRequestManager
 import com.google.android.gms.common.api.Status
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener

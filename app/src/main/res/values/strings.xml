@@ -1,33 +1,22 @@
 <resources>
     <string name="app_name">PointMe</string>
     <string name="action_settings">Settings</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="title_activity_main2">MainActivity</string>
 
     <string name="heading_destination">Navigating to %1$s</string>
     <string name="heading_distance">%1$s %2$s remaining</string>
     <string name="heading_direction">Destination is %1$s</string>
 
     <string name="attribution_hyperlink"><a href="https://www.flaticon.com/authors/kiranshastry">Arrow icon from kiranshastry</a></string>
-    <string name="init_heading_destination">Calculating destination...</string>
-    <string name="init_heading_distance">Calculating distance...</string>
-    <string name="init_heading_direction">Calculating direction...</string>
+    <string name="init_heading_destination">Calculating destination…</string>
+    <string name="init_heading_distance">Calculating distance…</string>
+    <string name="init_heading_direction">Calculating direction…</string>
     <string name="arrival_button">I\'ve arrived!</string>
     <string name="previous_activities_header">Previous Activities</string>
-    <string name="place_name_subheader">%1$s - %2$s %3$s</string>
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
+    <string name="place_name_subheader">%1$s - %2$s %3$s %4$s</string>
 
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
-
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <string name="title_activity_settings">SettingsActivity</string>
+    <!-- Preferences -->
+    <string name="distance_title">Distance units</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="distance_settings_key">Settings</string>
+    <string name="default_distance_setting">miles</string>
 </resources>

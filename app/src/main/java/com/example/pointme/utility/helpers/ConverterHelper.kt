@@ -1,5 +1,6 @@
 package com.example.pointme.utility.helpers
 
+import com.example.pointme.logic.settings.DistancePreferenceManager
 import kotlin.math.roundToInt
 
 fun getShortDirectionFromAngle(angle: Double): String {
@@ -14,20 +15,4 @@ fun getShortDirectionFromAngle(angle: Double): String {
         7 -> "NW"
         else -> throw IllegalArgumentException("Angle $angle cannot be converted to a short direction")
     }
-}
-
-fun getUserReadableDistance(distance: Double): Pair<String, String> {
-    val finalDistance: String
-    val units: String
-
-    val mileInFeet = 5280
-    if (distance > mileInFeet) {
-        finalDistance = "%.2f".format(distance / mileInFeet)
-        units = "miles"
-    } else {
-        finalDistance = "%.0f".format(distance)
-        units = "feet"
-    }
-
-    return Pair(finalDistance, units)
 }

@@ -3,7 +3,7 @@ package com.example.pointme.platform.listeners
 import android.location.Location
 import android.location.LocationListener
 import android.os.Bundle
-import com.example.pointme.managers.PositionManager
+import com.example.pointme.logic.PositionManager
 import com.example.pointme.models.Coordinate
 
 class GpsLocationListener(positionManager: PositionManager, callback: () -> Unit) : LocationListener {
@@ -11,7 +11,7 @@ class GpsLocationListener(positionManager: PositionManager, callback: () -> Unit
     private var mCallback: () -> Unit = callback
 
     override fun onLocationChanged(event: Location) {
-        mPositionManager.setCurrentCoordinates(Coordinate(event!!.latitude, event!!.longitude))
+        mPositionManager.setCurrentCoordinates(Coordinate(event.latitude, event.longitude))
 
         mCallback()
     }
