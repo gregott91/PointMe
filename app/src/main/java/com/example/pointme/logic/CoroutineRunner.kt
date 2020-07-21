@@ -1,4 +1,4 @@
-package com.example.pointme.managers
+package com.example.pointme.logic
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers

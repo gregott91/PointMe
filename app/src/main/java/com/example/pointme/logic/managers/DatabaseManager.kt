@@ -1,4 +1,4 @@
-package com.example.pointme.managers
+package com.example.pointme.logic.managers
 
 import android.content.Context
 import androidx.room.Room
@@ -11,7 +11,7 @@ class DatabaseManager {
     }
 
     fun getDatabase(context: Context): AppDatabase {
-        if (database == null) {
+        if (database == null || !database!!.isOpen) {
             database = Room.databaseBuilder(
                 context,
                 AppDatabase::class.java,
@@ -20,5 +20,13 @@ class DatabaseManager {
         }
 
         return database!!
+    }
+
+    fun closeDatabase() {
+        if (database == null || !database!!.isOpen) {
+            return;
+        }
+
+        database!!.close()
     }
 }

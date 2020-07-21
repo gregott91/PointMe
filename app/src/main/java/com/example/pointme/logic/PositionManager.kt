@@ -1,4 +1,4 @@
-package com.example.pointme.managers
+package com.example.pointme.logic
 
 import com.example.pointme.models.Location
 import com.example.pointme.models.Coordinate

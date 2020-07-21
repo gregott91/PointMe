@@ -1,0 +1,9 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+    <ListPreference
+        app:defaultValue="@string/default_distance_setting"
+        app:entries="@array/distance_entries"
+        app:entryValues="@array/distance_values"
+        app:key="@string/distance_settings_key"
+        app:title="@string/distance_title"
+        app:useSimpleSummaryProvider="true" />
+</PreferenceScreen>
