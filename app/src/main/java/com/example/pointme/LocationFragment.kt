@@ -57,10 +57,6 @@ class LocationFragment : Fragment() {
 
         autocompleteFragment.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG))
         autocompleteFragment.setOnPlaceSelectedListener(DestinationSelectionListener(findNavController(), requestManager))
-    }
-
-    override fun onResume() {
-        super.onResume()
 
         val operationManager =
             NavigationOperationManager(database.navigationOperationRepository())
@@ -78,6 +74,12 @@ class LocationFragment : Fragment() {
                 adapter = viewAdapter
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        viewAdapter.notifyDataSetChanged();
     }
 
     // todo extract this code
