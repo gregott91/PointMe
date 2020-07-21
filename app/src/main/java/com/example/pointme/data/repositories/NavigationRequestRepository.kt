@@ -4,6 +4,7 @@ import androidx.navigation.Navigation
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import com.example.pointme.models.dtos.NavigationRequestCoordinate
 import com.example.pointme.models.entities.NavigationRequest
 
 @Dao
@@ -16,8 +17,4 @@ interface NavigationRequestRepository {
 
     @Insert
     suspend fun insert(start: NavigationRequest)
-
-    // todo split out!!
-    data class NavigationRequestCoordinate(val requestId: Long, val placeName: String, val longitude: Double, val latitude: Double)
-
 }

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import com.example.pointme.models.dtos.CompletedNavigationOperation
 import com.example.pointme.models.entities.NavigationOperation
 import com.example.pointme.models.entities.NavigationRequest
 import java.time.LocalDateTime
@@ -36,14 +37,4 @@ interface NavigationOperationRepository {
 
     @Insert
     suspend fun insert(operation: NavigationOperation): Long
-
-    // todo split out!!
-    data class CompletedNavigationOperation(
-        val operationId: Int,
-        val destinationName: String,
-        val startLatitude: Double,
-        val startLongitude: Double,
-        val endLatitude: Double,
-        val endLongitude: Double,
-        val operationDate: LocalDateTime)
 }

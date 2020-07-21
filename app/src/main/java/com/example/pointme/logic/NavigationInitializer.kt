@@ -8,6 +8,7 @@ import com.example.pointme.data.repositories.NavigationRequestRepository
 import com.example.pointme.logic.managers.NavigationOperationManager
 import com.example.pointme.logic.managers.NavigationRequestManager
 import com.example.pointme.models.Coordinate
+import com.example.pointme.models.dtos.NavigationRequestCoordinate
 import com.example.pointme.models.entities.CoordinateEntity
 import com.example.pointme.models.entities.NavigationOperation
 import java.time.LocalDateTime
@@ -18,7 +19,7 @@ class NavigationInitializer(
     private var positionManager: PositionManager,
     private var coordinateEntityRepository: CoordinateEntityRepository
 ) {
-    suspend fun initializeNavigation(currentLocation: Location): Pair<NavigationRequestRepository.NavigationRequestCoordinate, NavigationOperation> {
+    suspend fun initializeNavigation(currentLocation: Location): Pair<NavigationRequestCoordinate, NavigationOperation> {
         val request = requestManager.getActiveNavigation();
 
         val operation = writeNewOperationIfNeeded(request, currentLocation)
@@ -27,7 +28,7 @@ class NavigationInitializer(
         return Pair(request, operation)
     }
 
-    private suspend fun writeNewOperationIfNeeded(request: NavigationRequestRepository.NavigationRequestCoordinate, currentLocation: Location): NavigationOperation {
+    private suspend fun writeNewOperationIfNeeded(request: NavigationRequestCoordinate, currentLocation: Location): NavigationOperation {
         var operation = operationManager.getByRequestId(request.requestId)
 
         if (operation == null) {
@@ -38,7 +39,7 @@ class NavigationInitializer(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private suspend fun writeNewOperation(currentLocation: Location, request: NavigationRequestRepository.NavigationRequestCoordinate): NavigationOperation {
+    private suspend fun writeNewOperation(currentLocation: Location, request: NavigationRequestCoordinate): NavigationOperation {
         val coordinateId = coordinateEntityRepository.insert(CoordinateEntity(currentLocation.longitude, currentLocation.latitude))
         val operation = NavigationOperation(LocalDateTime.now(), true, request.requestId, coordinateId)
         val operationId = operationManager.insert(operation)

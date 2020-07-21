@@ -3,11 +3,12 @@ package com.example.pointme.logic.managers
 import com.example.pointme.data.repositories.CoordinateEntityRepository
 import com.example.pointme.models.entities.NavigationRequest
 import com.example.pointme.data.repositories.NavigationRequestRepository
+import com.example.pointme.models.dtos.NavigationRequestCoordinate
 import com.example.pointme.models.entities.CoordinateEntity
 
 class NavigationRequestManager(private val navigationStartRepository: NavigationRequestRepository, private val coordinateRepo: CoordinateEntityRepository) {
 
-    suspend fun getActiveNavigation(): NavigationRequestRepository.NavigationRequestCoordinate {
+    suspend fun getActiveNavigation(): NavigationRequestCoordinate {
         return navigationStartRepository.getMostRecent()
     }
 

@@ -12,12 +12,13 @@ import com.example.pointme.R
 import com.example.pointme.data.repositories.NavigationOperationRepository
 import com.example.pointme.logic.settings.DistancePreferenceManager
 import com.example.pointme.models.Coordinate
+import com.example.pointme.models.dtos.CompletedNavigationOperation
 import com.example.pointme.models.entities.NavigationOperation
 import com.example.pointme.utility.helpers.getDirectionInfo
 import com.example.pointme.utility.helpers.getShortDirectionFromAngle
 
 class NavigationAdapter(
-    private val operations: Array<NavigationOperationRepository.CompletedNavigationOperation>,
+    private val operations: Array<CompletedNavigationOperation>,
     private val activity: Activity,
     private val preferenceManager: DistancePreferenceManager
 ) : RecyclerView.Adapter<NavigationAdapter.ViewHolder>() {
