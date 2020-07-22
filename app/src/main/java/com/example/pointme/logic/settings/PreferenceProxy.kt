@@ -4,8 +4,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import com.example.pointme.R
+import javax.inject.Inject
 
-class PreferenceProxy {
+class PreferenceProxy @Inject constructor() {
     fun getStringPreference(key: String, context: Context): String? {
         var preferences = getSharedPreferences(context)
         return preferences.getString(key, context.resources.getString(R.string.default_distance_setting))

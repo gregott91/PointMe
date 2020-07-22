@@ -4,13 +4,16 @@ import android.content.Context
 import androidx.room.Room
 import com.example.pointme.DATABASE_NAME
 import com.example.pointme.data.databases.AppDatabase
+import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class DatabaseManager {
+class DatabaseManager @Inject constructor(@ApplicationContext private val context: Context){
     private companion object {
         var database: AppDatabase? = null
     }
 
-    fun getDatabase(context: Context): AppDatabase {
+    fun getDatabase(): AppDatabase {
         if (database == null || !database!!.isOpen) {
             database = Room.databaseBuilder(
                 context,

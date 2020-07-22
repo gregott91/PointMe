@@ -12,18 +12,18 @@ import com.example.pointme.models.dtos.NavigationRequestCoordinate
 import com.example.pointme.models.entities.CoordinateEntity
 import com.example.pointme.models.entities.NavigationOperation
 import java.time.LocalDateTime
+import javax.inject.Inject
 
-class NavigationInitializer(
-    private var operationManager: NavigationOperationManager,
-    private var requestManager: NavigationRequestManager,
-    private var positionManager: PositionManager,
-    private var coordinateEntityRepository: CoordinateEntityRepository
+class NavigationInitializer @Inject constructor(
+    private val operationManager: NavigationOperationManager,
+    private val requestManager: NavigationRequestManager,
+    private val positionManager: PositionManager,
+    private val coordinateEntityRepository: CoordinateEntityRepository
 ) {
+
     suspend fun initializeNavigation(currentLocation: Location): Pair<NavigationRequestCoordinate, NavigationOperation> {
         val request = requestManager.getActiveNavigation();
-
         val operation = writeNewOperationIfNeeded(request, currentLocation)
-        positionManager.setDestinationCoordinates(Coordinate(request.latitude, request.longitude))
 
         return Pair(request, operation)
     }
@@ -40,7 +40,7 @@ class NavigationInitializer(
 
     @RequiresApi(Build.VERSION_CODES.O)
     private suspend fun writeNewOperation(currentLocation: Location, request: NavigationRequestCoordinate): NavigationOperation {
-        val coordinateId = coordinateEntityRepository.insert(CoordinateEntity(currentLocation.longitude, currentLocation.latitude))
+        val coordinateId = coordinateEntityRepository.insert(CoordinateEntity(currentLocation.latitude, currentLocation.longitude))
         val operation = NavigationOperation(LocalDateTime.now(), true, request.requestId, coordinateId)
         val operationId = operationManager.insert(operation)
 

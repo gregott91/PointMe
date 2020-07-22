@@ -5,16 +5,16 @@ import android.location.LocationListener
 import android.os.Bundle
 import com.example.pointme.logic.PositionManager
 import com.example.pointme.models.Coordinate
+import javax.inject.Inject
 
-class GpsLocationListener(positionManager: PositionManager, callback: () -> Unit) : LocationListener {
-    private var mPositionManager: PositionManager = positionManager
-    private var mCallback: () -> Unit = callback
-
+abstract class GpsLocationListener (private val positionManager: PositionManager) : LocationListener {
     override fun onLocationChanged(event: Location) {
-        mPositionManager.setCurrentCoordinates(Coordinate(event.latitude, event.longitude))
+        positionManager.setCurrentCoordinates(Coordinate(event.latitude, event.longitude))
 
-        mCallback()
+        coordinatesChanged()
     }
+
+    abstract fun coordinatesChanged()
 
     override fun onStatusChanged(p0: String?, p1: Int, p2: Bundle?) {
         TODO("Not yet implemented")

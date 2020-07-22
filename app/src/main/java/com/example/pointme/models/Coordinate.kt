@@ -22,7 +22,7 @@ class Coordinate(var latitude: Double, var longitude: Double) {
         dist = Math.toDegrees(dist)
         dist *= 60 * 1.1515
 
-        return dist
+        return dist * 5280
     }
 
     fun angleTo(
