@@ -4,10 +4,9 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import com.example.pointme.logic.PositionManager
+import javax.inject.Inject
 
-class SensorListener(positionManager: PositionManager, callback: () -> Unit) : SensorEventListener {
-    private var mPositionManager: PositionManager = positionManager
-    private var mCallback: () -> Unit = callback
+abstract class SensorListener (private val positionManager: PositionManager) : SensorEventListener {
 
     override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
         // todo need to implement
@@ -15,9 +14,10 @@ class SensorListener(positionManager: PositionManager, callback: () -> Unit) : S
 
     override fun onSensorChanged(event: SensorEvent?) {
         val currentDegree = -(event!!.values[0])
+        positionManager.setCurrentHeading(currentDegree)
 
-        mPositionManager.setCurrentHeading(currentDegree)
-
-        mCallback()
+        degreeChanged()
     }
+
+    abstract fun degreeChanged()
 }

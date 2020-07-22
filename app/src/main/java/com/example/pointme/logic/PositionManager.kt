@@ -3,37 +3,30 @@ package com.example.pointme.logic
 import com.example.pointme.models.Location
 import com.example.pointme.models.Coordinate
 import com.example.pointme.data.repositories.PositionRepository
+import javax.inject.Inject
 
-class PositionManager(positionRepository: PositionRepository) {
-    private var mPositionRepository: PositionRepository = positionRepository
-    private var lock = Object()
+class PositionManager @Inject constructor(private val positionRepository: PositionRepository) {
+
+    private var lock: Any = Object()
 
     fun getCurrentLocation(): Location {
         synchronized(lock) {
             return Location(
-                mPositionRepository.currentCoordinates,
-                mPositionRepository.currentHeading
+                positionRepository.currentCoordinates,
+                positionRepository.currentHeading
             )
         }
     }
 
     fun setCurrentHeading(heading: Float) {
         synchronized(lock) {
-            mPositionRepository.currentHeading = heading
+            positionRepository.currentHeading = heading
         }
     }
 
     fun setCurrentCoordinates(coordinate: Coordinate) {
         synchronized(lock) {
-            mPositionRepository.currentCoordinates = coordinate
+            positionRepository.currentCoordinates = coordinate
         }
-    }
-
-    fun setDestinationCoordinates(coordinate: Coordinate) {
-        mPositionRepository.destinationCoordinates = coordinate
-    }
-
-    fun getDestinationCoordinates(): Coordinate? {
-        return mPositionRepository.destinationCoordinates
     }
 }

@@ -5,8 +5,9 @@ import com.example.pointme.R
 import com.example.pointme.models.IDistanceUnit
 import com.example.pointme.models.KilometersDistanceUnit
 import com.example.pointme.models.MilesDistanceUnit
+import javax.inject.Inject
 
-class DistancePreferenceManager(private val proxy: PreferenceProxy) {
+class DistancePreferenceManager @Inject constructor(private val proxy: PreferenceProxy) {
     fun getDistancePreference(context: Context): IDistanceUnit {
         return when(val distancePreference = getDistancePreferenceValue(context)) {
             "miles" -> MilesDistanceUnit()

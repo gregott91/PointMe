@@ -15,6 +15,6 @@ import com.example.pointme.models.entities.CoordinateEntity
 @TypeConverters(LocalDateTimeConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun navigationOperationRepository(): NavigationOperationRepository
-    abstract fun navigationStartRepository(): NavigationRequestRepository
+    abstract fun navigationRequestRepository(): NavigationRequestRepository
     abstract fun coordinateEntityRepository(): CoordinateEntityRepository
 }

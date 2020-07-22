@@ -26,38 +26,37 @@ import com.example.pointme.platform.listeners.GpsLocationListener
 import com.example.pointme.platform.listeners.SensorListener
 import com.example.pointme.logic.*
 import com.example.pointme.models.Coordinate
-import com.example.pointme.data.repositories.ActivityCompatRepository
-import com.example.pointme.data.repositories.PositionRepository
-import com.example.pointme.logic.managers.DatabaseManager
 import com.example.pointme.logic.managers.NavigationOperationManager
-import com.example.pointme.logic.managers.NavigationRequestManager
 import com.example.pointme.logic.settings.DistancePreferenceManager
-import com.example.pointme.logic.settings.PreferenceProxy
+import com.example.pointme.models.dtos.NavigationRequestCoordinate
 import com.example.pointme.models.entities.NavigationOperation
 import com.example.pointme.utility.helpers.*
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ArrowFragment : Fragment() {
     private var image: ImageView? = null
     private var destinationHeading: TextView? = null
     private var distanceHeading: TextView? = null
     private var directionHeading: TextView? = null
 
+    // todo wrap these in a manager
     private lateinit var sensorManager: SensorManager
     private lateinit var locationManager: LocationManager
 
     private var prevDegree: Float = 0f
 
-    private lateinit var permissionManager: PermissionManager
-    private lateinit var positionManager: PositionManager
-    private lateinit var navigationOperationManager: NavigationOperationManager
-    private lateinit var navigationRequestManager: NavigationRequestManager
-    private lateinit var sensorListener: SensorListener
-    private lateinit var locationListener: GpsLocationListener
-    private lateinit var navigationInitializer: NavigationInitializer
-    private lateinit var distancePreferenceManager: DistancePreferenceManager
-    private var coroutineRunner: CoroutineRunner = CoroutineRunner()
+    @Inject lateinit var permissionManager: PermissionManager
+    @Inject lateinit var positionManager: PositionManager
+    @Inject lateinit var navigationOperationManager: NavigationOperationManager
+    @Inject lateinit var distancePreferenceManager: DistancePreferenceManager
+    @Inject lateinit var coroutineRunner: CoroutineRunner
+    @Inject lateinit var navigationInitializer: NavigationInitializer
 
+    private lateinit var sensorListener: LocalSensorListener
     private lateinit var navigationOperation: NavigationOperation
+    private lateinit var destination: NavigationRequestCoordinate
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -73,7 +72,6 @@ class ArrowFragment : Fragment() {
 
         initViewElements()
         initSystemServices()
-        initManagers()
         initArrivalButton()
 
         setupHyperlink()
@@ -90,9 +88,11 @@ class ArrowFragment : Fragment() {
             destinationHeading!!.text = String.format(resources.getString(R.string.heading_destination), request.placeName)
 
             navigationOperation = operation
+            destination = request
         }
 
         // for the system's orientation sensor registered listeners
+        sensorListener = LocalSensorListener()
         sensorManager.registerListener(
             sensorListener,
             sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
@@ -130,7 +130,7 @@ class ArrowFragment : Fragment() {
             LocationManager.GPS_PROVIDER,
             250,
             0.5f,
-            locationListener
+            LocalGpsLocationListener()
         )
 
         val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)!!
@@ -139,36 +139,12 @@ class ArrowFragment : Fragment() {
         return location
     }
 
-    private fun initManagers(){
-        val database = DatabaseManager().getDatabase(activity!!.applicationContext)
-
-        permissionManager = PermissionManager(ActivityCompatRepository())
-        positionManager = PositionManager(PositionRepository())
-        navigationOperationManager =
-            NavigationOperationManager(database.navigationOperationRepository())
-        navigationRequestManager =
-            NavigationRequestManager(database.navigationStartRepository(),
-                database.coordinateEntityRepository())
-
-        navigationInitializer = NavigationInitializer(
-            navigationOperationManager,
-            navigationRequestManager,
-            positionManager,
-            database.coordinateEntityRepository())
-
-        distancePreferenceManager = DistancePreferenceManager(PreferenceProxy())
-
-        sensorListener = SensorListener(positionManager) { rotateImage() }
-        locationListener = GpsLocationListener(positionManager) { rotateImage() }
-    }
-
     private fun initViewElements() {
         image = view!!.findViewById(R.id.pointer_arrow) as ImageView
         destinationHeading = view!!.findViewById(R.id.heading_destination) as TextView
         distanceHeading = view!!.findViewById(R.id.heading_distance) as TextView
         directionHeading = view!!.findViewById(R.id.heading_direction) as TextView
     }
-
 
     private fun initArrivalButton() {
         val button = activity!!.findViewById(R.id.arrival_button) as Button
@@ -182,33 +158,41 @@ class ArrowFragment : Fragment() {
     }
 
     private fun initSystemServices() {
+        // todo wrap these dudes
         sensorManager = activity!!.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         locationManager = activity!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
 
     private fun rotateImage() {
         val currentLocation = positionManager.getCurrentLocation()
-        val curDegreeSnapshot: Float? = currentLocation.heading
-        val curLatSnapshot: Double? = currentLocation.coordinate?.latitude
-        val curLonSnapshot: Double? = currentLocation.coordinate?.longitude
 
-        if (curDegreeSnapshot == null || curLatSnapshot == null || curLonSnapshot == null) {
+        if (currentLocation.coordinate == null) {
             return
         }
 
-        val destCoordinates = positionManager.getDestinationCoordinates()!!
-        val directionInfo = getDirectionInfo(
+        val destinationCoordinate = Coordinate(destination.latitude, destination.longitude)
+
+        setDistanceHeading(currentLocation, destinationCoordinate)
+        setDirectionHeading(currentLocation, destinationCoordinate)
+    }
+
+    private fun setDistanceHeading(currentLocation: com.example.pointme.models.Location, destination: Coordinate) {
+        val directionInfo = getDistanceInfo(
             currentLocation.coordinate!!,
-            destCoordinates,
+            destination,
             distancePreferenceManager.getDistancePreference(activity!!.applicationContext))
 
-        try {
-            distanceHeading!!.text = String.format(resources.getString(R.string.heading_distance), directionInfo.distance, directionInfo.units)
-            directionHeading!!.text = String.format(resources.getString(R.string.heading_direction), directionInfo.direction)
-        } catch (ex: IllegalStateException) {
-            // todo log this
-            return
-        }
+        distanceHeading!!.text = String.format(resources.getString(R.string.heading_distance), directionInfo.distance, directionInfo.units)
+    }
+
+    private fun setDirectionHeading(currentLocation: com.example.pointme.models.Location, destination: Coordinate) {
+        val curDegreeSnapshot: Float = currentLocation.heading ?: return
+
+        val directionInfo = getDirectionInfo(
+            currentLocation.coordinate!!,
+            destination)
+
+        directionHeading!!.text = String.format(resources.getString(R.string.heading_direction), directionInfo.direction)
 
         // create a rotation animation (reverse turn degree degrees)
         val angleToPoint = (directionInfo.angle + curDegreeSnapshot).toFloat()
@@ -227,5 +211,17 @@ class ArrowFragment : Fragment() {
         ra.fillAfter = true
 
         image!!.startAnimation(ra)
+    }
+
+    private inner class LocalGpsLocationListener : GpsLocationListener(positionManager) {
+        override fun coordinatesChanged() {
+            rotateImage()
+        }
+    }
+
+    private inner class LocalSensorListener : SensorListener(positionManager) {
+        override fun degreeChanged() {
+            rotateImage()
+        }
     }
 }

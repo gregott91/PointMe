@@ -15,6 +15,7 @@ import com.example.pointme.models.Coordinate
 import com.example.pointme.models.dtos.CompletedNavigationOperation
 import com.example.pointme.models.entities.NavigationOperation
 import com.example.pointme.utility.helpers.getDirectionInfo
+import com.example.pointme.utility.helpers.getDistanceInfo
 import com.example.pointme.utility.helpers.getShortDirectionFromAngle
 
 class NavigationAdapter(
@@ -38,17 +39,18 @@ class NavigationAdapter(
     override fun onBindViewHolder(viewHolder: NavigationAdapter.ViewHolder, position: Int) {
         val operation = operations[position]
 
+        val startCoordinate = Coordinate(operation.startLatitude, operation.startLongitude)
+        val endCoordinate = Coordinate(operation.endLatitude, operation.endLongitude)
+
         val preference = preferenceManager.getDistancePreference(activity.applicationContext)
-        val directionInfo = getDirectionInfo(
-            Coordinate(operation.startLatitude, operation.startLongitude),
-            Coordinate(operation.endLatitude, operation.endLongitude),
-            preference)
+        val directionInfo = getDirectionInfo(startCoordinate, endCoordinate)
+        val distanceInfo = getDistanceInfo(startCoordinate, endCoordinate, preference)
 
         viewHolder.nameTextView.text = operation.destinationName
         viewHolder.distanceTextView.text = String.format(activity.resources.getString(R.string.place_name_subheader),
             operation.operationDate.toLocalDate().toString(),
-            directionInfo.distance,
-            directionInfo.units,
+            distanceInfo.distance,
+            distanceInfo.units,
             directionInfo.direction
         )
     }

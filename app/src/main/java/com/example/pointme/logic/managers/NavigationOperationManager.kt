@@ -3,8 +3,9 @@ package com.example.pointme.logic.managers
 import com.example.pointme.models.entities.NavigationOperation
 import com.example.pointme.data.repositories.NavigationOperationRepository
 import com.example.pointme.models.dtos.CompletedNavigationOperation
+import javax.inject.Inject
 
-class NavigationOperationManager(private val navigationOperationRepository: NavigationOperationRepository) {
+class NavigationOperationManager @Inject constructor(private val navigationOperationRepository: NavigationOperationRepository) {
     suspend fun getLastSessions(limit: Int): Array<CompletedNavigationOperation> {
         return navigationOperationRepository.getCompleted(limit)
     }
