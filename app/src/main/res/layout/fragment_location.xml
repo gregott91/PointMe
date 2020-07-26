@@ -21,13 +21,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/PreviousActivitiesHeader"
-        app:layout_constraintBottom_toTopOf="@+id/previous_activities"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:text="@string/previous_activities_header"
         app:layout_constraintTop_toBottomOf="@id/autocomplete_fragment" />
 
     <RelativeLayout
+        android:id="@+id/getting_started_layout"
         android:layout_width="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -62,5 +62,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/previous_activities_header" />
+        app:layout_constraintTop_toBottomOf="@id/previous_activities_header"
+        android:visibility="gone" />
 </androidx.constraintlayout.widget.ConstraintLayout>

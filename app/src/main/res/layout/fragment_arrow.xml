@@ -55,6 +55,7 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/pointer_arrow"
         android:layout_marginTop="40dp"
+        android:textAllCaps="false"
         android:text="@string/arrival_button" />
 
     <TextView

@@ -1,6 +1,7 @@
 package com.example.pointme.logic
 
 import android.content.Context
+import android.view.View
 import com.example.pointme.R
 import com.example.pointme.platform.listeners.DestinationSelectionListener
 import com.google.android.libraries.places.api.Places
@@ -25,6 +26,13 @@ class PlacesProxy @Inject constructor(
 
         if (!Places.isInitialized()) {
             Places.initialize(context, apiKey)
+        }
+    }
+
+    fun openFragment(placeFragment: AutocompleteSupportFragment) {
+        val root: View = placeFragment.view!!
+        root.post {
+            root.findViewById<View>(R.id.places_autocomplete_search_input).performClick()
         }
     }
 }

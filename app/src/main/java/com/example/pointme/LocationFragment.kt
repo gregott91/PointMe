@@ -1,22 +1,25 @@
 package com.example.pointme
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import android.widget.RelativeLayout
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pointme.logic.CoroutineRunner
 import com.example.pointme.logic.PlacesProxy
-import com.example.pointme.platform.listeners.DestinationSelectionListener
 import com.example.pointme.logic.managers.NavigationOperationManager
 import com.example.pointme.logic.settings.DistancePreferenceManager
-import com.example.pointme.models.dtos.CompletedNavigationOperation
 import com.example.pointme.platform.adapters.NavigationAdapter
+import com.example.pointme.platform.listeners.DestinationSelectionListener
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class LocationFragment : Fragment() {
@@ -38,30 +41,39 @@ class LocationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        placesProxy.initialize(
-            childFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment)
+        val placesFragment = childFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment
+        placesProxy.initialize(placesFragment)
 
         coroutineRunner.run {
             val sessions = operationManager.getLastSessions(DEFAULT_SESSION_LIMIT)
             viewAdapter = NavigationAdapter(sessions, activity!!, preferenceManager)
 
             if (sessions.count() == 0) {
-                setupGettingStarted()
+                setupGettingStarted(placesFragment)
             } else {
                 setupPastNavigation()
             }
         }
     }
 
-    private fun setupGettingStarted() {
-
+    private fun setupGettingStarted(placesFragment: AutocompleteSupportFragment) {
+        val startButton = activity!!.findViewById<Button>(R.id.getting_started_button) as Button
+        startButton.setOnClickListener {
+            placesProxy.openFragment(placesFragment)
+        }
     }
 
     private fun setupPastNavigation() {
+        val setupView = activity!!.findViewById<RelativeLayout>(R.id.getting_started_layout)
+        setupView.visibility = View.GONE
+
         val viewManager = LinearLayoutManager(activity!!)
 
         coroutineRunner.onUiThread(activity!!, Runnable {
-            activity!!.findViewById<RecyclerView>(R.id.previous_activities).apply {
+            val recyclerView = activity!!.findViewById<RecyclerView>(R.id.previous_activities)
+            recyclerView.visibility = View.VISIBLE
+
+            recyclerView.apply {
                 setHasFixedSize(true)
                 layoutManager = viewManager
                 adapter = viewAdapter
