@@ -16,16 +16,12 @@ import javax.inject.Inject
 
 class NavigationInitializer @Inject constructor(
     private val operationManager: NavigationOperationManager,
-    private val requestManager: NavigationRequestManager,
-    private val positionManager: PositionManager,
     private val coordinateEntityRepository: CoordinateEntityRepository
 ) {
-
-    suspend fun initializeNavigation(currentLocation: Location): Pair<NavigationRequestCoordinate, NavigationOperation> {
-        val request = requestManager.getActiveNavigation();
+    suspend fun initializeNavigation(request: NavigationRequestCoordinate, currentLocation: Location): NavigationOperation {
         val operation = writeNewOperationIfNeeded(request, currentLocation)
 
-        return Pair(request, operation)
+        return operation
     }
 
     private suspend fun writeNewOperationIfNeeded(request: NavigationRequestCoordinate, currentLocation: Location): NavigationOperation {

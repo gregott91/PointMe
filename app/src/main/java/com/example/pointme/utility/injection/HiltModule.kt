@@ -1,15 +1,11 @@
 package com.example.pointme.utility.injection
 
-import androidx.navigation.Navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment.findNavController
-import com.example.pointme.ArrowFragment
-import com.example.pointme.LocationFragment
 import com.example.pointme.data.databases.AppDatabase
 import com.example.pointme.data.repositories.CoordinateEntityRepository
 import com.example.pointme.data.repositories.NavigationOperationRepository
 import com.example.pointme.data.repositories.NavigationRequestRepository
 import com.example.pointme.data.repositories.PositionRepository
-import com.example.pointme.logic.managers.DatabaseManager
+import com.example.pointme.logic.DatabaseProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,7 +19,7 @@ object HiltModule {
     //abstract fun bindAnalyticsService(appDatabase: AppDatabase): AnalyticsService
 
     @Provides
-    fun provideAppDatabase(dbManager: DatabaseManager): AppDatabase {
+    fun provideAppDatabase(dbManager: DatabaseProvider): AppDatabase {
         return dbManager.getDatabase()
     }
 

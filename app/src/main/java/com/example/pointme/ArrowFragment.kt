@@ -22,15 +22,20 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.pointme.platform.listeners.GpsLocationListener
-import com.example.pointme.platform.listeners.SensorListener
-import com.example.pointme.logic.*
-import com.example.pointme.models.Coordinate
+import com.example.pointme.logic.CoroutineRunner
+import com.example.pointme.logic.NavigationInitializer
+import com.example.pointme.logic.PermissionManager
+import com.example.pointme.logic.PositionManager
 import com.example.pointme.logic.managers.NavigationOperationManager
+import com.example.pointme.logic.managers.NavigationRequestManager
 import com.example.pointme.logic.settings.DistancePreferenceManager
+import com.example.pointme.models.Coordinate
 import com.example.pointme.models.dtos.NavigationRequestCoordinate
 import com.example.pointme.models.entities.NavigationOperation
-import com.example.pointme.utility.helpers.*
+import com.example.pointme.platform.listeners.GpsLocationListener
+import com.example.pointme.platform.listeners.SensorListener
+import com.example.pointme.utility.helpers.getDirectionInfo
+import com.example.pointme.utility.helpers.getDistanceInfo
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -53,6 +58,7 @@ class ArrowFragment : Fragment() {
     @Inject lateinit var distancePreferenceManager: DistancePreferenceManager
     @Inject lateinit var coroutineRunner: CoroutineRunner
     @Inject lateinit var navigationInitializer: NavigationInitializer
+    @Inject lateinit var requestManager: NavigationRequestManager
 
     private lateinit var sensorListener: LocalSensorListener
     private lateinit var navigationOperation: NavigationOperation
@@ -73,22 +79,23 @@ class ArrowFragment : Fragment() {
         initViewElements()
         initSystemServices()
         initArrivalButton()
-
         setupHyperlink()
+
+        coroutineRunner.run {
+            destination = requestManager.getActiveNavigation()
+
+            activity!!.runOnUiThread({
+                destinationHeading!!.text =
+                    String.format(resources.getString(R.string.heading_destination), destination.placeName)
+            })
+        }
 
         var currentLocation: Location? = null
         val permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
         val hasAllPermissions = permissionManager.requestNeededPermissions(permissions, GPS_PERMISSION_CODE, activity!!)
         if (hasAllPermissions) {
             currentLocation = requestLocationUpdates()
-        }
-
-        coroutineRunner.run {
-            val (request, operation) = navigationInitializer.initializeNavigation(currentLocation!!)
-            destinationHeading!!.text = String.format(resources.getString(R.string.heading_destination), request.placeName)
-
-            navigationOperation = operation
-            destination = request
+            initializeNavigation(currentLocation)
         }
 
         // for the system's orientation sensor registered listeners
@@ -108,7 +115,8 @@ class ArrowFragment : Fragment() {
 
         // Checking whether user granted the permission or not.
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            requestLocationUpdates()
+            var currentLocation: Location = requestLocationUpdates()
+            initializeNavigation(currentLocation)
         }
     }
 
@@ -137,6 +145,12 @@ class ArrowFragment : Fragment() {
         positionManager.setCurrentCoordinates(Coordinate(location.latitude, location.longitude))
 
         return location
+    }
+
+    private fun initializeNavigation(currentLocation: Location) {
+        coroutineRunner.run {
+            navigationOperation = navigationInitializer.initializeNavigation(destination, currentLocation)
+        }
     }
 
     private fun initViewElements() {
