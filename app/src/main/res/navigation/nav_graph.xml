@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/LocationFragment"
-        android:name="com.example.pointme.LocationFragment"
+        android:name="com.ottsandbox.pointme.LocationFragment"
         tools:layout="@layout/fragment_location">
 
         <action
@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/ArrowFragment"
-        android:name="com.example.pointme.ArrowFragment"
+        android:name="com.ottsandbox.pointme.ArrowFragment"
         tools:layout="@layout/fragment_arrow">
 
         <action
