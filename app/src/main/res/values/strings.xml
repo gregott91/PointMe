@@ -10,8 +10,10 @@
     <string name="init_heading_destination">Calculating destination…</string>
     <string name="init_heading_distance">Calculating distance…</string>
     <string name="init_heading_direction">Calculating direction…</string>
-    <string name="arrival_button">I\'ve arrived!</string>
+    <string name="arrival_button">I\'ve Arrived!</string>
     <string name="previous_activities_header">Previous Activities</string>
+    <string name="getting_started_text">Looks like you don\'t have any activities yet! Go ahead and press \"Start Navigating\" or the search bar above to get started.</string>
+    <string name="getting_started_button">Start Navigating</string>
     <string name="place_name_subheader">%1$s - %2$s %3$s %4$s</string>
 
     <!-- Preferences -->
