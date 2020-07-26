@@ -12,6 +12,7 @@ import com.example.pointme.logic.PlacesProxy
 import com.example.pointme.platform.listeners.DestinationSelectionListener
 import com.example.pointme.logic.managers.NavigationOperationManager
 import com.example.pointme.logic.settings.DistancePreferenceManager
+import com.example.pointme.models.dtos.CompletedNavigationOperation
 import com.example.pointme.platform.adapters.NavigationAdapter
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,24 +41,32 @@ class LocationFragment : Fragment() {
         placesProxy.initialize(
             childFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment)
 
-        setupPastNavigation()
+        coroutineRunner.run {
+            val sessions = operationManager.getLastSessions(DEFAULT_SESSION_LIMIT)
+            viewAdapter = NavigationAdapter(sessions, activity!!, preferenceManager)
+
+            if (sessions.count() == 0) {
+                setupGettingStarted()
+            } else {
+                setupPastNavigation()
+            }
+        }
+    }
+
+    private fun setupGettingStarted() {
+
     }
 
     private fun setupPastNavigation() {
-        coroutineRunner.run {
-            val sessions = operationManager.getLastSessions(DEFAULT_SESSION_LIMIT)
+        val viewManager = LinearLayoutManager(activity!!)
 
-            val viewManager = LinearLayoutManager(activity!!)
-            viewAdapter = NavigationAdapter(sessions, activity!!, preferenceManager)
-
-            coroutineRunner.onUiThread(activity!!, Runnable {
-                activity!!.findViewById<RecyclerView>(R.id.previous_activities).apply {
-                    setHasFixedSize(true)
-                    layoutManager = viewManager
-                    adapter = viewAdapter
-                }
-            })
-        }
+        coroutineRunner.onUiThread(activity!!, Runnable {
+            activity!!.findViewById<RecyclerView>(R.id.previous_activities).apply {
+                setHasFixedSize(true)
+                layoutManager = viewManager
+                adapter = viewAdapter
+            }
+        })
     }
 
     override fun onResume() {

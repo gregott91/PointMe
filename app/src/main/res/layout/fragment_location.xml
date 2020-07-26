@@ -27,6 +27,33 @@
         android:text="@string/previous_activities_header"
         app:layout_constraintTop_toBottomOf="@id/autocomplete_fragment" />
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/previous_activities_header"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/getting_started_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:paddingStart="30dp"
+            android:paddingEnd="30dp"
+            app:layout_constraintBottom_toTopOf="@id/getting_started_button"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="@string/getting_started_text"
+            style="@style/GettingStartedText" />
+
+        <Button
+            android:id="@+id/getting_started_button"
+            android:layout_below="@+id/getting_started_text"
+            android:text="@string/getting_started_button"
+            style="@style/GettingStartedButton" />
+    </RelativeLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/previous_activities"
         android:scrollbars="vertical"
