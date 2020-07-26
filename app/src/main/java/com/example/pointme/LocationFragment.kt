@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.EditText
 import android.widget.RelativeLayout
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,7 +18,6 @@ import com.example.pointme.platform.listeners.DestinationSelectionListener
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-
 
 @AndroidEntryPoint
 class LocationFragment : Fragment() {
@@ -69,7 +67,7 @@ class LocationFragment : Fragment() {
 
         val viewManager = LinearLayoutManager(activity!!)
 
-        coroutineRunner.onUiThread(activity!!, Runnable {
+        coroutineRunner.onUiThread(Runnable {
             val recyclerView = activity!!.findViewById<RecyclerView>(R.id.previous_activities)
             recyclerView.visibility = View.VISIBLE
 

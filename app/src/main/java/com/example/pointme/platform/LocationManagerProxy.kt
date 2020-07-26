@@ -2,7 +2,6 @@ package com.example.pointme.platform
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.location.Location
 import android.location.LocationManager
 import com.example.pointme.models.Coordinate
 import com.example.pointme.platform.listeners.GpsLocationListener

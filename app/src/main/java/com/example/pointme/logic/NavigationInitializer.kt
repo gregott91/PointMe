@@ -19,12 +19,6 @@ class NavigationInitializer @Inject constructor(
     private val coordinateEntityRepository: CoordinateEntityRepository
 ) {
     suspend fun initializeNavigation(request: NavigationRequestCoordinate, currentLocation: Coordinate): NavigationOperation {
-        val operation = writeNewOperationIfNeeded(request, currentLocation)
-
-        return operation
-    }
-
-    private suspend fun writeNewOperationIfNeeded(request: NavigationRequestCoordinate, currentLocation: Coordinate): NavigationOperation {
         var operation = operationManager.getByRequestId(request.requestId)
 
         if (operation == null) {

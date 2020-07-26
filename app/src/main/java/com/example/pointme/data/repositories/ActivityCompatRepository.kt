@@ -11,8 +11,4 @@ class ActivityCompatRepository @Inject constructor() {
 
         return result == PackageManager.PERMISSION_GRANTED
     }
-
-    fun requestPermissions(permissions: Array<String>, code: Int, activity: Activity){
-        ActivityCompat.requestPermissions(activity, permissions, code)
-    }
 }
