@@ -1,4 +1,4 @@
-package com.example.pointme.logic
+package com.example.pointme.logic.managers
 
 import android.app.Activity
 import com.example.pointme.data.repositories.ActivityCompatRepository

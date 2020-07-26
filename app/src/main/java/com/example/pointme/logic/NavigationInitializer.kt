@@ -18,13 +18,13 @@ class NavigationInitializer @Inject constructor(
     private val operationManager: NavigationOperationManager,
     private val coordinateEntityRepository: CoordinateEntityRepository
 ) {
-    suspend fun initializeNavigation(request: NavigationRequestCoordinate, currentLocation: Location): NavigationOperation {
+    suspend fun initializeNavigation(request: NavigationRequestCoordinate, currentLocation: Coordinate): NavigationOperation {
         val operation = writeNewOperationIfNeeded(request, currentLocation)
 
         return operation
     }
 
-    private suspend fun writeNewOperationIfNeeded(request: NavigationRequestCoordinate, currentLocation: Location): NavigationOperation {
+    private suspend fun writeNewOperationIfNeeded(request: NavigationRequestCoordinate, currentLocation: Coordinate): NavigationOperation {
         var operation = operationManager.getByRequestId(request.requestId)
 
         if (operation == null) {
@@ -35,7 +35,7 @@ class NavigationInitializer @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private suspend fun writeNewOperation(currentLocation: Location, request: NavigationRequestCoordinate): NavigationOperation {
+    private suspend fun writeNewOperation(currentLocation: Coordinate, request: NavigationRequestCoordinate): NavigationOperation {
         val coordinateId = coordinateEntityRepository.insert(CoordinateEntity(currentLocation.latitude, currentLocation.longitude))
         val operation = NavigationOperation(LocalDateTime.now(), true, request.requestId, coordinateId)
         val operationId = operationManager.insert(operation)
