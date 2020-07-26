@@ -1,0 +1,1 @@
+We will not share your data with anyone. All your information will stay on your phone and can be deleted at any time.
