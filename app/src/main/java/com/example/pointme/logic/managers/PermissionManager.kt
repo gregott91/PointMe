@@ -1,27 +1,29 @@
 package com.example.pointme.logic.managers
 
-import android.app.Activity
+import androidx.fragment.app.Fragment
 import com.example.pointme.data.repositories.ActivityCompatRepository
 import javax.inject.Inject
 
-class PermissionManager @Inject constructor(private val activityCompatRepository: ActivityCompatRepository) {
+class PermissionManager @Inject constructor(
+    private val activityCompatRepository: ActivityCompatRepository,
+    private val fragment: Fragment
+) {
 
-    fun requestNeededPermissions(permissions: Array<String>, code: Int, activity: Activity): Boolean {
+    fun requestNeededPermissions(permissions: Array<String>, code: Int): Boolean {
         val neededPermissions: ArrayList<String> = ArrayList()
         var hasPermissions = true
 
         permissions.forEach { permission ->
-            if (!activityCompatRepository.hasPermission(permission, activity)) {
+            if (!activityCompatRepository.hasPermission(permission, fragment.activity!!)) {
                 hasPermissions = false
                 neededPermissions.add(permission)
             }
         }
 
         if (neededPermissions.any()) {
-            activityCompatRepository.requestPermissions(
+            fragment.requestPermissions(
                 neededPermissions.toTypedArray(),
-                code,
-                activity
+                code
             )
         }
 

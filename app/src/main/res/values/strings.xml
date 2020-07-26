@@ -15,6 +15,9 @@
     <string name="getting_started_text">Looks like you don\'t have any activities yet! Go ahead and press \"Start Navigating\" or the search bar above to get started.</string>
     <string name="getting_started_button">Start Navigating</string>
     <string name="place_name_subheader">%1$s - %2$s %3$s %4$s</string>
+    <string name="navigation_error">Unable to navigate without permission</string>
+    <string name="navigation_error_action">RETRY</string>
+    <string name="place_error">Unable to select location</string>
 
     <!-- Preferences -->
     <string name="distance_title">Distance units</string>

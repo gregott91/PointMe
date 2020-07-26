@@ -26,6 +26,7 @@ import com.example.pointme.models.Coordinate
 import com.example.pointme.models.dtos.NavigationRequestCoordinate
 import com.example.pointme.models.entities.NavigationOperation
 import com.example.pointme.platform.LocationManagerProxy
+import com.example.pointme.platform.MessageDisplayer
 import com.example.pointme.platform.OrientationSensor
 import com.example.pointme.platform.listeners.GpsLocationListener
 import com.example.pointme.platform.listeners.SensorListener
@@ -41,6 +42,8 @@ class ArrowFragment : Fragment() {
     private var distanceHeading: TextView? = null
     private var directionHeading: TextView? = null
 
+    private var sensorListener = LocalSensorListener()
+
     private var prevDegree: Float = 0f
     private var currentDegree: Float = 0f
     private var currentCoordinate: Coordinate? = null
@@ -53,8 +56,8 @@ class ArrowFragment : Fragment() {
     @Inject lateinit var requestManager: NavigationRequestManager
     @Inject lateinit var orientationSensor: OrientationSensor
     @Inject lateinit var locationManagerProxy: LocationManagerProxy
+    @Inject lateinit var messageDisplayer: MessageDisplayer
 
-    private lateinit var sensorListener: LocalSensorListener
     private lateinit var navigationOperation: NavigationOperation
     private lateinit var destination: NavigationRequestCoordinate
 
@@ -66,6 +69,31 @@ class ArrowFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_arrow, container, false)
     }
 
+    override fun onStart() {
+        super.onStart()
+
+        coroutineRunner.run {
+            destination = requestManager.getActiveNavigation()
+
+            coroutineRunner.onUiThread(Runnable {
+                val hasAllPermissions = requestPermissions()
+
+                if (hasAllPermissions) {
+                    initializeNavigation()
+                }
+            })
+        }
+    }
+
+    private fun requestPermissions(): Boolean {
+        val permissions = arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+
+        return permissionManager.requestNeededPermissions(permissions, GPS_PERMISSION_CODE)
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
         super.onResume()
@@ -73,22 +101,7 @@ class ArrowFragment : Fragment() {
         initViewElements()
         initArrivalButton()
 
-        coroutineRunner.run {
-            destination = requestManager.getActiveNavigation()
-
-            coroutineRunner.onUiThread(activity!!, Runnable {
-                destinationHeading!!.text =
-                    String.format(resources.getString(R.string.heading_destination), destination.placeName)
-            })
-        }
-
-        val permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
-        val hasAllPermissions = permissionManager.requestNeededPermissions(permissions, GPS_PERMISSION_CODE, activity!!)
-        if (hasAllPermissions) {
-            initializeNavigation()
-        }
-
-        sensorListener = LocalSensorListener()
+        destinationHeading!!.text = String.format(resources.getString(R.string.heading_destination), destination.placeName)
         orientationSensor.registerListener(sensorListener)
     }
 
@@ -102,6 +115,13 @@ class ArrowFragment : Fragment() {
         // Checking whether user granted the permission or not.
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             initializeNavigation()
+        } else {
+            messageDisplayer.displayMessageWithAction(
+                resources.getString(R.string.navigation_error),
+                resources.getString(R.string.navigation_error_action)
+            ) {
+                requestPermissions()
+            }
         }
     }
 

@@ -6,7 +6,8 @@ import androidx.navigation.fragment.findNavController
 import com.example.pointme.DESTINATION_LOG_TAG
 import com.example.pointme.R
 import com.example.pointme.logic.managers.NavigationRequestManager
-import com.example.pointme.platform.ToastDisplayer
+import com.example.pointme.models.MessageDuration
+import com.example.pointme.platform.MessageDisplayer
 import com.google.android.gms.common.api.Status
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
@@ -18,7 +19,7 @@ import javax.inject.Inject
 class DestinationSelectionListener @Inject constructor(
     private val fragment: Fragment,
     private val navigationRequestManager: NavigationRequestManager,
-    private val toastDisplayer: ToastDisplayer
+    private val messageDisplayer: MessageDisplayer
 ) : PlaceSelectionListener {
 
     override fun onPlaceSelected(place: Place) {
@@ -34,6 +35,6 @@ class DestinationSelectionListener @Inject constructor(
 
     override fun onError(p0: Status) {
         Log.e(DESTINATION_LOG_TAG, p0.statusMessage!!)
-        toastDisplayer.displayMessage("Unable to select location")
+        messageDisplayer.displayMessage(fragment.resources.getString(R.string.place_error), MessageDuration.SHORT)
     }
 }
