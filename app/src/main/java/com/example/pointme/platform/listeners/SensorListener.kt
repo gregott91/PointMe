@@ -3,10 +3,8 @@ package com.example.pointme.platform.listeners
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
-import com.example.pointme.logic.PositionManager
-import javax.inject.Inject
 
-abstract class SensorListener (private val positionManager: PositionManager) : SensorEventListener {
+abstract class SensorListener : SensorEventListener {
 
     override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
         // todo need to implement
@@ -14,10 +12,9 @@ abstract class SensorListener (private val positionManager: PositionManager) : S
 
     override fun onSensorChanged(event: SensorEvent?) {
         val currentDegree = -(event!!.values[0])
-        positionManager.setCurrentHeading(currentDegree)
 
-        degreeChanged()
+        degreeChanged(currentDegree)
     }
 
-    abstract fun degreeChanged()
+    abstract fun degreeChanged(currentHeading: Float)
 }

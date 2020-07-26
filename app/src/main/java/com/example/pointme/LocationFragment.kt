@@ -5,18 +5,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pointme.logic.CoroutineRunner
+import com.example.pointme.logic.PlacesProxy
 import com.example.pointme.platform.listeners.DestinationSelectionListener
 import com.example.pointme.logic.managers.NavigationOperationManager
 import com.example.pointme.logic.settings.DistancePreferenceManager
 import com.example.pointme.platform.adapters.NavigationAdapter
-import com.google.android.libraries.places.api.Places
-import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
-import dagger.hilt.DefineComponent
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -26,6 +23,7 @@ class LocationFragment : Fragment() {
     @Inject lateinit var operationManager: NavigationOperationManager
     @Inject lateinit var preferenceManager: DistancePreferenceManager
     @Inject lateinit var coroutineRunner: CoroutineRunner
+    @Inject lateinit var placesProxy: PlacesProxy
 
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
 
@@ -39,40 +37,32 @@ class LocationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initializePlaces()
+        placesProxy.initialize(
+            childFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment)
 
-        val autocompleteFragment =
-            childFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment
+        setupPastNavigation()
+    }
 
-        autocompleteFragment.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG))
-        autocompleteFragment.setOnPlaceSelectedListener(destinationSelectionListener)
-
+    private fun setupPastNavigation() {
         coroutineRunner.run {
             val sessions = operationManager.getLastSessions(DEFAULT_SESSION_LIMIT)
 
             val viewManager = LinearLayoutManager(activity!!)
             viewAdapter = NavigationAdapter(sessions, activity!!, preferenceManager)
 
-            activity!!.findViewById<RecyclerView>(R.id.previous_activities).apply {
-                setHasFixedSize(true)
-                layoutManager = viewManager
-                adapter = viewAdapter
-            }
+            coroutineRunner.onUiThread(activity!!, Runnable {
+                activity!!.findViewById<RecyclerView>(R.id.previous_activities).apply {
+                    setHasFixedSize(true)
+                    layoutManager = viewManager
+                    adapter = viewAdapter
+                }
+            })
         }
     }
 
     override fun onResume() {
         super.onResume()
 
-        viewAdapter.notifyDataSetChanged();
-    }
-
-    // todo extract this code
-    private fun initializePlaces() {
-        val apiKey = getString(R.string.api_key)
-
-        if (!Places.isInitialized()) {
-            Places.initialize(activity!!.applicationContext, apiKey)
-        }
+        viewAdapter.notifyDataSetChanged()
     }
 }
