@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -48,24 +47,12 @@
 
     <Button
         android:id="@+id/arrival_button"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:paddingLeft="50dp"
-        android:paddingRight="50dp"
-        android:layout_centerHorizontal="true"
         android:layout_below="@+id/pointer_arrow"
-        android:layout_marginTop="40dp"
-        android:textAllCaps="false"
-        android:text="@string/arrival_button" />
+        android:text="@string/arrival_button"
+        style="@style/ArrivalButton"/>
 
     <TextView
         android:id="@+id/footer_attribution"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:text="@string/attribution_hyperlink"
-        style="@style/FooterText"
-        android:layout_gravity="bottom"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="20dp"/>
+        style="@style/FooterText" />
 </RelativeLayout>

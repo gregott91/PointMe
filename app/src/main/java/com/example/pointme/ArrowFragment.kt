@@ -155,12 +155,12 @@ class ArrowFragment : Fragment() {
     }
 
     private fun setDistanceHeading(currentLocation: com.example.pointme.models.Location, destination: Coordinate) {
-        val directionInfo = getDistanceInfo(
+        val distanceInfo = getDistanceInfo(
             currentLocation.coordinate!!,
             destination,
             distancePreferenceManager.getDistancePreference(activity!!.applicationContext))
 
-        distanceHeading!!.text = String.format(resources.getString(R.string.heading_distance), directionInfo.distance, directionInfo.units)
+        distanceHeading!!.text = String.format(resources.getString(R.string.heading_distance), distanceInfo.distance, distanceInfo.units)
     }
 
     private fun setDirectionHeading(currentLocation: com.example.pointme.models.Location, destination: Coordinate) {

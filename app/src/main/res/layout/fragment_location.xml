@@ -51,7 +51,7 @@
             android:id="@+id/getting_started_button"
             android:layout_below="@+id/getting_started_text"
             android:text="@string/getting_started_button"
-            style="@style/GettingStartedButton" />
+            style="@style/GettingStartedButton"/>
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView
