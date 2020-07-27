@@ -21,6 +21,8 @@
 
         <action
             android:id="@+id/action_arrow_to_location"
+            app:popUpTo="@+id/LocationFragment"
+            app:popUpToInclusive="true"
             app:destination="@id/LocationFragment" />
     </fragment>
 </navigation>
