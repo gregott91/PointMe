@@ -12,7 +12,7 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-class CoroutineRunner @Inject constructor(private val fragment: Fragment) {
+class CoroutineRunner @Inject constructor(private val activity: Activity) {
     private var context: CoroutineContext = EmptyCoroutineContext
     private var dispatcher: CoroutineDispatcher = Dispatchers.IO
 
@@ -25,6 +25,6 @@ class CoroutineRunner @Inject constructor(private val fragment: Fragment) {
     }
 
     fun onUiThread(action: Runnable ) {
-        fragment.activity!!.runOnUiThread(action)
+        activity.runOnUiThread(action)
     }
 }

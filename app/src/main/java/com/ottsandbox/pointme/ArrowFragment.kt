@@ -13,14 +13,15 @@ import android.view.animation.RotateAnimation
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.ottsandbox.pointme.logic.CoroutineRunner
 import com.ottsandbox.pointme.logic.NavigationInitializer
-import com.ottsandbox.pointme.logic.managers.PermissionManager
 import com.ottsandbox.pointme.logic.managers.NavigationOperationManager
 import com.ottsandbox.pointme.logic.managers.NavigationRequestManager
+import com.ottsandbox.pointme.logic.managers.PermissionManager
 import com.ottsandbox.pointme.logic.settings.DistancePreferenceManager
 import com.ottsandbox.pointme.models.Coordinate
 import com.ottsandbox.pointme.models.dtos.NavigationRequestCoordinate
@@ -34,6 +35,7 @@ import com.ottsandbox.pointme.utility.helpers.getDirectionInfo
 import com.ottsandbox.pointme.utility.helpers.getDistanceInfo
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class ArrowFragment : Fragment() {
@@ -65,6 +67,12 @@ class ArrowFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                navigateBack()
+            }
+        })
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_arrow, container, false)
     }
@@ -99,7 +107,6 @@ class ArrowFragment : Fragment() {
         super.onResume()
 
         initViewElements()
-        initArrivalButton()
 
         destinationHeading!!.text = String.format(resources.getString(R.string.heading_destination), destination.placeName)
         orientationSensor.registerListener(sensorListener)
@@ -149,17 +156,19 @@ class ArrowFragment : Fragment() {
 
         val linkTextView: TextView = view!!.findViewById(R.id.footer_attribution)
         linkTextView.movementMethod = LinkMovementMethod.getInstance()
-    }
 
-    private fun initArrivalButton() {
         val button = activity!!.findViewById(R.id.arrival_button) as Button
         button.setOnClickListener {
-            coroutineRunner.run {
-                navigationOperationManager.deactivate(navigationOperation)
-            }
-
-            findNavController().navigate(R.id.action_arrow_to_location)
+            navigateBack()
         }
+    }
+
+    private fun navigateBack() {
+        coroutineRunner.run {
+            navigationOperationManager.deactivate(navigationOperation)
+        }
+
+        findNavController().navigate(R.id.action_arrow_to_location)
     }
 
     private fun rotateImage() {
@@ -178,7 +187,7 @@ class ArrowFragment : Fragment() {
         val distanceInfo = getDistanceInfo(
             currentLocation.coordinate!!,
             destination,
-            distancePreferenceManager.getDistancePreference(activity!!.applicationContext))
+            distancePreferenceManager.getDistancePreference())
 
         distanceHeading!!.text = String.format(resources.getString(R.string.heading_distance), distanceInfo.distance, distanceInfo.units)
     }

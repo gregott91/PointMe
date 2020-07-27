@@ -42,7 +42,7 @@ class NavigationAdapter(
         val startCoordinate = Coordinate(operation.startLatitude, operation.startLongitude)
         val endCoordinate = Coordinate(operation.endLatitude, operation.endLongitude)
 
-        val preference = preferenceManager.getDistancePreference(activity.applicationContext)
+        val preference = preferenceManager.getDistancePreference()
         val directionInfo = getDirectionInfo(startCoordinate, endCoordinate)
         val distanceInfo = getDistanceInfo(startCoordinate, endCoordinate, preference)
 
