@@ -8,6 +8,7 @@ import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.Button
@@ -23,6 +24,7 @@ import com.ottsandbox.pointme.logic.managers.NavigationOperationManager
 import com.ottsandbox.pointme.logic.managers.NavigationRequestManager
 import com.ottsandbox.pointme.logic.managers.PermissionManager
 import com.ottsandbox.pointme.logic.settings.DistancePreferenceManager
+import com.ottsandbox.pointme.logic.settings.PreferenceManager
 import com.ottsandbox.pointme.models.Coordinate
 import com.ottsandbox.pointme.models.dtos.NavigationRequestCoordinate
 import com.ottsandbox.pointme.models.entities.NavigationOperation
@@ -59,6 +61,7 @@ class ArrowFragment : Fragment() {
     @Inject lateinit var orientationSensor: OrientationSensor
     @Inject lateinit var locationManagerProxy: LocationManagerProxy
     @Inject lateinit var messageDisplayer: MessageDisplayer
+    @Inject lateinit var preferenceManager: PreferenceManager
 
     private lateinit var navigationOperation: NavigationOperation
     private lateinit var destination: NavigationRequestCoordinate
@@ -107,6 +110,10 @@ class ArrowFragment : Fragment() {
         super.onResume()
 
         initViewElements()
+
+        if (preferenceManager.keepOn) {
+            activity!!.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
 
         destinationHeading!!.text = String.format(resources.getString(R.string.heading_destination), destination.placeName)
         orientationSensor.registerListener(sensorListener)

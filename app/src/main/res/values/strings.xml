@@ -24,4 +24,8 @@
     <string name="title_activity_settings">Settings</string>
     <string name="distance_settings_key">Settings</string>
     <string name="default_distance_setting">miles</string>
+    <string name="keep_on_settings_key">KeepScreenOn</string>
+    <string name="keep_on_settings_title">Keep Screen On When Navigating</string>
+    <string name="keep_on_settings_summary">When checked, your phone\'s screen will stay on when navigating with the app open</string>
+    <string name="default_keepon_setting">true</string>
 </resources>

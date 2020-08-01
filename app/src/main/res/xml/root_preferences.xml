@@ -6,4 +6,9 @@
         app:key="@string/distance_settings_key"
         app:title="@string/distance_title"
         app:useSimpleSummaryProvider="true" />
+    <CheckBoxPreference
+        app:defaultValue="@string/default_keepon_setting"
+        app:key="@string/keep_on_settings_key"
+        app:title="@string/keep_on_settings_title"
+        app:summary="@string/keep_on_settings_summary"/>
 </PreferenceScreen>

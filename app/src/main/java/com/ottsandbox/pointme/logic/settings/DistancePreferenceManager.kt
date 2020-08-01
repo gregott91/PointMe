@@ -8,19 +8,12 @@ import com.ottsandbox.pointme.models.MilesDistanceUnit
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class DistancePreferenceManager @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val proxy: PreferenceProxy
-) {
+class DistancePreferenceManager @Inject constructor(private val preferenceManager: PreferenceManager) {
     fun getDistancePreference(): IDistanceUnit {
-        return when(val distancePreference = getDistancePreferenceValue()) {
+        return when(val distancePreference = preferenceManager.distancePreference) {
             "miles" -> MilesDistanceUnit()
             "kilometers" -> KilometersDistanceUnit()
             else -> throw NotImplementedError("Unable to parse distance preference $distancePreference")
         }
-    }
-
-    private fun getDistancePreferenceValue(): String? {
-        return proxy.getStringPreference(context.resources.getString(R.string.distance_settings_key), context)
     }
 }
