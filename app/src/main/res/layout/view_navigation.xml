@@ -9,7 +9,7 @@
         android:id="@+id/place_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/PreviousActivitiesPlaceName" />
+        style="@style/PreviousActivitiesPlaceName" />s
 
     <TextView
         android:id="@+id/navigation_info"
