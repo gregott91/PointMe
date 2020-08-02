@@ -172,6 +172,7 @@ class ArrowFragment : Fragment() {
                 ),
                 "",
                 MainActivity::class.java,
+                R.id.ArrowFragment,
                 NotificationType.NAVIGATION,
                 ChannelType.DEFAULT
             )

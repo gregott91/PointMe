@@ -10,7 +10,6 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.navigation.NavDeepLinkBuilder
-import com.ottsandbox.pointme.MainActivity
 import com.ottsandbox.pointme.R
 import com.ottsandbox.pointme.logic.factories.ChannelFactory
 import com.ottsandbox.pointme.logic.factories.NotificationFactory
@@ -30,26 +29,14 @@ class NotificationManager @Inject constructor(
 ) {
     private var notificationManager: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-    fun <T>makeNotification(title: String, text: String, intentClass: Class<T>, notificationType: NotificationType, channelType: ChannelType) {
-        val notification = notificationFactory.getNotification(title, text, intentClass, notificationType)
+    fun <T>makeNotification(title: String, text: String, intentClass: Class<T>, fragmentId: Int, notificationType: NotificationType, channelType: ChannelType) where T : Activity {
+        val notification = notificationFactory.getNotification(title, text, intentClass, fragmentId, notificationType)
         val channel = channelFactory.getChannel(channelType)
 
-        makeNotification(notification, channel)
+        makeNotification<T>(notification, channel)
     }
 
-    fun makeNotification(notification: Notification, channelType: ChannelType) {
-        val channel = channelFactory.getChannel(channelType)
-
-        makeNotification(notification, channel)
-    }
-
-    fun <T>makeNotification(title: String, text: String, intentClass: Class<T>, notificationType: NotificationType, channel: Channel) {
-        val notification = notificationFactory.getNotification(title, text, intentClass, notificationType)
-
-        makeNotification(notification, channel)
-    }
-
-    fun makeNotification(notification: Notification, channel: Channel) {
+    private fun <T>makeNotification(notification: Notification<T>, channel: Channel) where T : Activity {
         val builder = createBuilder(notification, channel)
         createChannel(channel)
 
@@ -63,17 +50,11 @@ class NotificationManager @Inject constructor(
         notificationManager.cancel(metadata.id)
     }
 
-    fun removeNotification(id: Int) {
-
-    }
-
-    private fun createBuilder(notification: Notification, channel: Channel): NotificationCompat.Builder {
-        //val pendingIntent: PendingIntent = PendingIntent.getActivity(activity, 0, notification.intent, 0)
-
+    private fun <T>createBuilder(notification: Notification<T>, channel: Channel): NotificationCompat.Builder where T : Activity {
         val pendingIntent: PendingIntent = NavDeepLinkBuilder(context)
-            .setComponentName(MainActivity::class.java)
+            .setComponentName(notification.intentClass)
             .setGraph(R.navigation.nav_graph)
-            .setDestination(R.id.ArrowFragment)
+            .setDestination(notification.fragmentId)
             .createPendingIntent()
 
         return NotificationCompat.Builder(activity, channel.id)

@@ -1,5 +1,8 @@
 package com.ottsandbox.pointme.models
 
-import android.content.Intent
-
-class Notification (val title: String, val text: String, val intent: Intent, val metadata: NotificationMetadata){}
+class Notification<T>(
+    val title: String,
+    val text: String,
+    val intentClass: Class<T>,
+    val fragmentId: Int,
+    val metadata: NotificationMetadata) {}

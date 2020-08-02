@@ -18,10 +18,9 @@ class NotificationFactory @Inject constructor(private val activity: Activity) {
         return notificationMappings[type] ?: error("Unable to get notification metadata from type $type")
     }
 
-    fun <T>getNotification(title: String, text: String, intentClass: Class<T>, type: NotificationType): Notification {
+    fun <T>getNotification(title: String, text: String, intentClass: Class<T>, fragmentId: Int, type: NotificationType): Notification<T> {
         val metadata: NotificationMetadata = getNotificationMetadata(type)
-        val intent = Intent(activity, intentClass)
 
-        return Notification(title, text, intent, metadata)
+        return Notification(title, text, intentClass, fragmentId, metadata)
     }
 }
