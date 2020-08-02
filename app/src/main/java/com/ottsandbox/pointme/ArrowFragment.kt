@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
@@ -51,6 +53,7 @@ class ArrowFragment : Fragment() {
     private var directionHeading: TextView? = null
 
     private var sensorListener = LocalSensorListener()
+    private var locationListener = LocalGpsLocationListener()
 
     private var prevDegree: Float = 0f
     private var currentDegree: Float = 0f
@@ -98,14 +101,6 @@ class ArrowFragment : Fragment() {
                 if (hasAllPermissions) {
                     initializeNavigation()
                 }
-
-                notificationManager.makeNotification(
-                    "Navigating to BUTTS",
-                    "Test content",
-                    ArrowFragment::class.java,
-                    NotificationType.NAVIGATION,
-                    ChannelType.DEFAULT
-                )
             })
         }
     }
@@ -126,12 +121,8 @@ class ArrowFragment : Fragment() {
         super.onResume()
 
         initViewElements()
-
-        if (preferenceManager.keepOn) {
-            activity!!.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        } else {
-            activity!!.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        }
+        configureNotification()
+        configureFlags()
 
         destinationHeading!!.text = String.format(resources.getString(R.string.heading_destination), destination.placeName)
         orientationSensor.registerListener(sensorListener)
@@ -160,12 +151,41 @@ class ArrowFragment : Fragment() {
     override fun onPause() {
         super.onPause()
 
-        // to stop the listener and save battery
+        locationManagerProxy.removeLocationUpdates(locationListener)
         orientationSensor.unregisterListener(sensorListener)
     }
 
+    private fun configureFlags() {
+        if (preferenceManager.keepOn) {
+            activity!!.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            activity!!.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+    }
+
+    private fun configureNotification() {
+        if (preferenceManager.notify) {
+            notificationManager.makeNotification(
+                String.format(
+                    resources.getString(R.string.heading_destination),
+                    destination.placeName
+                ),
+                "",
+                MainActivity::class.java,
+                NotificationType.NAVIGATION,
+                ChannelType.DEFAULT
+            )
+        } else {
+            removeNotification()
+        }
+    }
+
+    private fun removeNotification() {
+        notificationManager.removeNotification(NotificationType.NAVIGATION)
+    }
+
     private fun initializeNavigation() {
-        locationManagerProxy.requestLocationUpdates(LocalGpsLocationListener())
+        locationManagerProxy.requestLocationUpdates(locationListener)
         currentCoordinate = locationManagerProxy.getLastKnownCoordinates()
 
         coroutineRunner.run {
@@ -189,6 +209,8 @@ class ArrowFragment : Fragment() {
     }
 
     private fun navigateBack() {
+        removeNotification()
+
         coroutineRunner.run {
             navigationOperationManager.deactivate(navigationOperation)
         }
@@ -208,21 +230,13 @@ class ArrowFragment : Fragment() {
         setDirectionHeading(currentLocation, destinationCoordinate)
     }
 
-    private fun setDistanceHeading(currentLocation: com.ottsandbox.pointme.models.Location, destinationCoords: Coordinate) {
+    private fun setDistanceHeading(currentLocation: com.ottsandbox.pointme.models.Location, destinationCoordinates: Coordinate) {
         val distanceInfo = getDistanceInfo(
             currentLocation.coordinate!!,
-            destinationCoords,
+            destinationCoordinates,
             distancePreferenceManager.getDistancePreference())
 
         val distanceText = String.format(resources.getString(R.string.heading_distance), distanceInfo.distance, distanceInfo.units)
-
-        notificationManager.makeNotification(
-            String.format(resources.getString(R.string.heading_destination), destination.placeName),
-            distanceText,
-            ArrowFragment::class.java,
-            NotificationType.NAVIGATION,
-            ChannelType.DEFAULT
-        )
 
         distanceHeading!!.text = distanceText
     }

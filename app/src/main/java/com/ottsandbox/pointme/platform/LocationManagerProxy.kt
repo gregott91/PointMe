@@ -21,6 +21,10 @@ class LocationManagerProxy @Inject constructor(@ActivityContext context: Context
         )
     }
 
+    fun removeLocationUpdates(locationListener: GpsLocationListener) {
+        locationManager.removeUpdates(locationListener)
+    }
+
     fun getLastKnownCoordinates(): Coordinate {
         val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)!!
         return Coordinate(location.latitude, location.longitude)

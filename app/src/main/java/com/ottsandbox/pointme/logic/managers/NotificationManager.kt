@@ -9,6 +9,8 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.navigation.NavDeepLinkBuilder
+import com.ottsandbox.pointme.MainActivity
 import com.ottsandbox.pointme.R
 import com.ottsandbox.pointme.logic.factories.ChannelFactory
 import com.ottsandbox.pointme.logic.factories.NotificationFactory
@@ -56,8 +58,23 @@ class NotificationManager @Inject constructor(
         }
     }
 
+    fun removeNotification(notificationType: NotificationType) {
+        val metadata = notificationFactory.getNotificationMetadata(notificationType)
+        notificationManager.cancel(metadata.id)
+    }
+
+    fun removeNotification(id: Int) {
+
+    }
+
     private fun createBuilder(notification: Notification, channel: Channel): NotificationCompat.Builder {
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(activity, 0, notification.intent, 0)
+        //val pendingIntent: PendingIntent = PendingIntent.getActivity(activity, 0, notification.intent, 0)
+
+        val pendingIntent: PendingIntent = NavDeepLinkBuilder(context)
+            .setComponentName(MainActivity::class.java)
+            .setGraph(R.navigation.nav_graph)
+            .setDestination(R.id.ArrowFragment)
+            .createPendingIntent()
 
         return NotificationCompat.Builder(activity, channel.id)
             .setSmallIcon(R.drawable.ic_notification)

@@ -19,4 +19,10 @@ class PreferenceManager @Inject constructor(
             context.resources.getString(R.string.keep_on_settings_key),
             context.resources.getString(R.string.default_keepon_setting).toBoolean(),
             context)
+
+    val notify: Boolean
+        get() = preferenceProxy.getBooleanPreference(
+            context.resources.getString(R.string.notification_settings_key),
+            context.resources.getString(R.string.default_notification_setting).toBoolean(),
+            context)
 }
