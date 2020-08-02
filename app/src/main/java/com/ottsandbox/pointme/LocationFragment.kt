@@ -16,6 +16,7 @@ import com.ottsandbox.pointme.logic.settings.DistancePreferenceManager
 import com.ottsandbox.pointme.platform.adapters.NavigationAdapter
 import com.ottsandbox.pointme.platform.listeners.DestinationSelectionListener
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
+import com.ottsandbox.pointme.utility.DEFAULT_SESSION_LIMIT
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

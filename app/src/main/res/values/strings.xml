@@ -28,4 +28,8 @@
     <string name="keep_on_settings_title">Keep Screen On When Navigating</string>
     <string name="keep_on_settings_summary">When checked, your phone\'s screen will stay on when navigating with the app open</string>
     <string name="default_keepon_setting">true</string>
+
+    <!-- Notifications -->
+    <string name="default_channel_name">default</string>
+    <string name="default_channel_description">Default channel for the PointMe app</string>
 </resources>
