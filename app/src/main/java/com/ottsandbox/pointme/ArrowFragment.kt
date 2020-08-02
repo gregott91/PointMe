@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
@@ -22,10 +24,13 @@ import com.ottsandbox.pointme.logic.CoroutineRunner
 import com.ottsandbox.pointme.logic.NavigationInitializer
 import com.ottsandbox.pointme.logic.managers.NavigationOperationManager
 import com.ottsandbox.pointme.logic.managers.NavigationRequestManager
+import com.ottsandbox.pointme.logic.managers.NotificationManager
 import com.ottsandbox.pointme.logic.managers.PermissionManager
 import com.ottsandbox.pointme.logic.settings.DistancePreferenceManager
 import com.ottsandbox.pointme.logic.settings.PreferenceManager
+import com.ottsandbox.pointme.models.ChannelType
 import com.ottsandbox.pointme.models.Coordinate
+import com.ottsandbox.pointme.models.NotificationType
 import com.ottsandbox.pointme.models.dtos.NavigationRequestCoordinate
 import com.ottsandbox.pointme.models.entities.NavigationOperation
 import com.ottsandbox.pointme.platform.LocationManagerProxy
@@ -33,13 +38,14 @@ import com.ottsandbox.pointme.platform.MessageDisplayer
 import com.ottsandbox.pointme.platform.OrientationSensor
 import com.ottsandbox.pointme.platform.listeners.GpsLocationListener
 import com.ottsandbox.pointme.platform.listeners.SensorListener
+import com.ottsandbox.pointme.utility.GPS_PERMISSION_CODE
 import com.ottsandbox.pointme.utility.helpers.getDirectionInfo
 import com.ottsandbox.pointme.utility.helpers.getDistanceInfo
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
-
 @AndroidEntryPoint
+@RequiresApi(Build.VERSION_CODES.O)
 class ArrowFragment : Fragment() {
     private var image: ImageView? = null
     private var destinationHeading: TextView? = null
@@ -47,6 +53,7 @@ class ArrowFragment : Fragment() {
     private var directionHeading: TextView? = null
 
     private var sensorListener = LocalSensorListener()
+    private var locationListener = LocalGpsLocationListener()
 
     private var prevDegree: Float = 0f
     private var currentDegree: Float = 0f
@@ -62,12 +69,14 @@ class ArrowFragment : Fragment() {
     @Inject lateinit var locationManagerProxy: LocationManagerProxy
     @Inject lateinit var messageDisplayer: MessageDisplayer
     @Inject lateinit var preferenceManager: PreferenceManager
+    @Inject lateinit var notificationManager: NotificationManager
 
     private lateinit var navigationOperation: NavigationOperation
     private lateinit var destination: NavigationRequestCoordinate
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
@@ -102,7 +111,9 @@ class ArrowFragment : Fragment() {
             Manifest.permission.ACCESS_COARSE_LOCATION
         )
 
-        return permissionManager.requestNeededPermissions(permissions, GPS_PERMISSION_CODE)
+        return permissionManager.requestNeededPermissions(permissions,
+            GPS_PERMISSION_CODE
+        )
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -110,12 +121,8 @@ class ArrowFragment : Fragment() {
         super.onResume()
 
         initViewElements()
-
-        if (preferenceManager.keepOn) {
-            activity!!.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        } else {
-            activity!!.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        }
+        configureNotification()
+        configureFlags()
 
         destinationHeading!!.text = String.format(resources.getString(R.string.heading_destination), destination.placeName)
         orientationSensor.registerListener(sensorListener)
@@ -144,12 +151,41 @@ class ArrowFragment : Fragment() {
     override fun onPause() {
         super.onPause()
 
-        // to stop the listener and save battery
+        locationManagerProxy.removeLocationUpdates(locationListener)
         orientationSensor.unregisterListener(sensorListener)
     }
 
+    private fun configureFlags() {
+        if (preferenceManager.keepOn) {
+            activity!!.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            activity!!.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+    }
+
+    private fun configureNotification() {
+        if (preferenceManager.notify) {
+            notificationManager.makeNotification(
+                String.format(
+                    resources.getString(R.string.heading_destination),
+                    destination.placeName
+                ),
+                "",
+                MainActivity::class.java,
+                NotificationType.NAVIGATION,
+                ChannelType.DEFAULT
+            )
+        } else {
+            removeNotification()
+        }
+    }
+
+    private fun removeNotification() {
+        notificationManager.removeNotification(NotificationType.NAVIGATION)
+    }
+
     private fun initializeNavigation() {
-        locationManagerProxy.requestLocationUpdates(LocalGpsLocationListener())
+        locationManagerProxy.requestLocationUpdates(locationListener)
         currentCoordinate = locationManagerProxy.getLastKnownCoordinates()
 
         coroutineRunner.run {
@@ -173,6 +209,8 @@ class ArrowFragment : Fragment() {
     }
 
     private fun navigateBack() {
+        removeNotification()
+
         coroutineRunner.run {
             navigationOperationManager.deactivate(navigationOperation)
         }
@@ -192,13 +230,15 @@ class ArrowFragment : Fragment() {
         setDirectionHeading(currentLocation, destinationCoordinate)
     }
 
-    private fun setDistanceHeading(currentLocation: com.ottsandbox.pointme.models.Location, destination: Coordinate) {
+    private fun setDistanceHeading(currentLocation: com.ottsandbox.pointme.models.Location, destinationCoordinates: Coordinate) {
         val distanceInfo = getDistanceInfo(
             currentLocation.coordinate!!,
-            destination,
+            destinationCoordinates,
             distancePreferenceManager.getDistancePreference())
 
-        distanceHeading!!.text = String.format(resources.getString(R.string.heading_distance), distanceInfo.distance, distanceInfo.units)
+        val distanceText = String.format(resources.getString(R.string.heading_distance), distanceInfo.distance, distanceInfo.units)
+
+        distanceHeading!!.text = distanceText
     }
 
     private fun setDirectionHeading(currentLocation: com.ottsandbox.pointme.models.Location, destination: Coordinate) {

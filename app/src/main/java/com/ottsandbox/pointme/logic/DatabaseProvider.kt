@@ -2,7 +2,7 @@ package com.ottsandbox.pointme.logic
 
 import android.content.Context
 import androidx.room.Room
-import com.ottsandbox.pointme.DATABASE_NAME
+import com.ottsandbox.pointme.utility.DATABASE_NAME
 import com.ottsandbox.pointme.data.databases.AppDatabase
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject

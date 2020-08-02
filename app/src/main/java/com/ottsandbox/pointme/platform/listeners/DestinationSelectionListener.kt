@@ -3,7 +3,7 @@ package com.ottsandbox.pointme.platform.listeners
 import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.ottsandbox.pointme.DESTINATION_LOG_TAG
+import com.ottsandbox.pointme.utility.DESTINATION_LOG_TAG
 import com.ottsandbox.pointme.R
 import com.ottsandbox.pointme.logic.managers.NavigationRequestManager
 import com.ottsandbox.pointme.models.MessageDuration

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.RelativeLayout
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ottsandbox.pointme.logic.CoroutineRunner
@@ -16,6 +17,7 @@ import com.ottsandbox.pointme.logic.settings.DistancePreferenceManager
 import com.ottsandbox.pointme.platform.adapters.NavigationAdapter
 import com.ottsandbox.pointme.platform.listeners.DestinationSelectionListener
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
+import com.ottsandbox.pointme.utility.DEFAULT_SESSION_LIMIT
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

@@ -11,4 +11,9 @@
         app:key="@string/keep_on_settings_key"
         app:title="@string/keep_on_settings_title"
         app:summary="@string/keep_on_settings_summary"/>
+    <CheckBoxPreference
+        app:defaultValue="@string/default_notification_setting"
+        app:key="@string/notification_settings_key"
+        app:title="@string/notification_settings_title"
+        app:summary="@string/notification_settings_summary"/>
 </PreferenceScreen>
