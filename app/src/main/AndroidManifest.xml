@@ -10,9 +10,9 @@
     <application
         android:name=".utility.injection.HiltApplication"
         android:allowBackup="true"
-        android:icon="@drawable/arrow_icon"
+        android:icon="@mipmap/ic_arrow"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/arrow_icon_round"
+        android:roundIcon="@mipmap/ic_arrow_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity

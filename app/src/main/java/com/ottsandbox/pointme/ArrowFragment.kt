@@ -113,6 +113,8 @@ class ArrowFragment : Fragment() {
 
         if (preferenceManager.keepOn) {
             activity!!.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            activity!!.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
 
         destinationHeading!!.text = String.format(resources.getString(R.string.heading_destination), destination.placeName)
