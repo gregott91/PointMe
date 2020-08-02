@@ -5,7 +5,9 @@ abstract class IDistanceUnit {
     abstract val largeUnitName: String
     abstract val smallUnitNamePlural: String
     abstract val largeUnitNamePlural: String
-    abstract val maxSmallValue: Double
+    abstract val smallestValue: Double
+    abstract val twoDecimalValue: Double
+    abstract val oneDecimalValue: Double
 
     abstract fun convertToSmallValueFromFeet(feetVal: Double): Double
 
@@ -15,24 +17,33 @@ abstract class IDistanceUnit {
 
         val smallValue: Double = convertToSmallValueFromFeet(feetVal)
 
-        if (smallValue > maxSmallValue) {
-            val finalDistance = smallValue / maxSmallValue
-            finalDistanceFormatted = "%.2f".format(smallValue / maxSmallValue)
+        if (smallValue > smallestValue) {
+            val finalDistance = smallValue / smallestValue
 
-            units = if (finalDistance == 1.0) {
-                largeUnitName
-            } else {
-                largeUnitNamePlural
-            }
+            finalDistanceFormatted = getFormatString(finalDistance).format(finalDistance)
+
+            units = getUnits(finalDistance, largeUnitName, largeUnitNamePlural)
         } else {
             finalDistanceFormatted = "%.0f".format(smallValue)
-            units = if (smallValue == 1.0) {
-                smallUnitName
-            } else {
-                smallUnitNamePlural
-            }
+            units = getUnits(smallValue, smallUnitName, smallUnitNamePlural)
         }
 
         return Pair(finalDistanceFormatted, units)
+    }
+
+    private fun getUnits(distance: Double, singleName: String, pluralName: String): String {
+        return if (distance == 1.0) {
+            singleName
+        } else {
+            pluralName
+        }
+    }
+
+    private fun getFormatString(distance: Double): String {
+        return when {
+            distance < twoDecimalValue -> { "%.2f" }
+            distance < oneDecimalValue -> { "%.1f" }
+            else -> { "%.0f" }
+        }
     }
 }

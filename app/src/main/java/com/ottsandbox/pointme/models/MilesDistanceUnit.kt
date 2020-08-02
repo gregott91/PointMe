@@ -7,7 +7,9 @@ class MilesDistanceUnit : IDistanceUnit() {
     override val largeUnitName: String = "mile"
     override val smallUnitNamePlural: String = "feet"
     override val largeUnitNamePlural: String = "miles"
-    override val maxSmallValue: Double = 5280.0
+    override val smallestValue: Double = 5280.0
+    override val twoDecimalValue: Double = 10.0
+    override val oneDecimalValue: Double = 100.0
 
     override fun convertToSmallValueFromFeet(feetVal: Double): Double {
         return feetVal
