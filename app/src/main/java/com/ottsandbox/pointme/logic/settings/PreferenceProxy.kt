@@ -4,20 +4,33 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import com.ottsandbox.pointme.R
+import com.ottsandbox.pointme.models.NotificationType
+import dagger.Binds
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class PreferenceProxy @Inject constructor() {
-    fun getStringPreference(key: String, defaultValue: String, context: Context): String {
-        var preferences = getSharedPreferences(context)
-        return preferences.getString(key, defaultValue)!!
+class PreferenceProxy @Inject constructor(@ApplicationContext private val context: Context) {
+    inline fun <reified T>getPreference(key: String, defaultValue: T? = null): T {
+        val preferences = getSharedPreferences()
+
+        return when (T::class) {
+            String::class -> preferences.getString(key, (defaultValue ?: "") as String)!!
+            Boolean::class -> preferences.getBoolean(key, (defaultValue ?: true) as Boolean)
+            else -> error("Unable to get shared preference for type ${T::class}")
+        } as T
     }
 
-    fun getBooleanPreference(key: String, defaultValue: Boolean, context: Context): Boolean {
-        var preferences = getSharedPreferences(context)
-        return preferences.getBoolean(key, defaultValue)!!
+    inline fun <reified T>registerPreferenceChangedListener(settingKey: String, crossinline onChange: (newValue: T) -> Unit) {
+        getSharedPreferences()
+            .registerOnSharedPreferenceChangeListener { _, key ->
+                if (key == settingKey) {
+                    val preference = getPreference<T>(settingKey)
+                    onChange(preference)
+                }
+            }
     }
 
-    private fun getSharedPreferences(context: Context): SharedPreferences {
+    fun getSharedPreferences(): SharedPreferences {
         return PreferenceManager.getDefaultSharedPreferences(context)
     }
 }
