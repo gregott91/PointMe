@@ -5,15 +5,19 @@ import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.ottsandbox.pointme.R
 import com.ottsandbox.pointme.data.repositories.NavigationOperationRepository
+import com.ottsandbox.pointme.logic.DestinationSelectionHandler
 import com.ottsandbox.pointme.logic.settings.DistancePreferenceManager
 import com.ottsandbox.pointme.models.Coordinate
 import com.ottsandbox.pointme.models.dtos.CompletedNavigationOperation
 import com.ottsandbox.pointme.models.entities.NavigationOperation
+import com.ottsandbox.pointme.platform.listeners.DestinationSelectionListener
 import com.ottsandbox.pointme.utility.helpers.getDirectionInfo
 import com.ottsandbox.pointme.utility.helpers.getDistanceInfo
 import com.ottsandbox.pointme.utility.helpers.getShortDirectionFromAngle
@@ -21,9 +25,11 @@ import com.ottsandbox.pointme.utility.helpers.getShortDirectionFromAngle
 class NavigationAdapter(
     private val operations: Array<CompletedNavigationOperation>,
     private val activity: Activity,
-    private val preferenceManager: DistancePreferenceManager
+    private val preferenceManager: DistancePreferenceManager,
+    private val handler: DestinationSelectionHandler
 ) : RecyclerView.Adapter<NavigationAdapter.ViewHolder>() {
     inner class ViewHolder(listItemView: View) : RecyclerView.ViewHolder(listItemView) {
+        val layout: LinearLayout = listItemView.findViewById(R.id.place_parent)
         val nameTextView: TextView = listItemView.findViewById(R.id.place_name)
         val distanceTextView: TextView = listItemView.findViewById(R.id.navigation_info)
     }
@@ -45,6 +51,10 @@ class NavigationAdapter(
         val preference = preferenceManager.getDistancePreference()
         val directionInfo = getDirectionInfo(startCoordinate, endCoordinate)
         val distanceInfo = getDistanceInfo(startCoordinate, endCoordinate, preference)
+
+        viewHolder.layout.setOnClickListener {
+            handler.handlePlaceSelected(operation.destinationName, operation.endLatitude, operation.endLongitude)
+        }
 
         viewHolder.nameTextView.text = operation.destinationName
         viewHolder.distanceTextView.text = String.format(activity.resources.getString(R.string.place_name_subheader),

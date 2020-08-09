@@ -11,6 +11,7 @@ import com.ottsandbox.pointme.platform.MessageDisplayer
 import com.google.android.gms.common.api.Status
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
+import com.ottsandbox.pointme.logic.DestinationSelectionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -18,19 +19,12 @@ import javax.inject.Inject
 
 class DestinationSelectionListener @Inject constructor(
     private val fragment: Fragment,
-    private val navigationRequestManager: NavigationRequestManager,
-    private val messageDisplayer: MessageDisplayer
+    private val messageDisplayer: MessageDisplayer,
+    private val handler: DestinationSelectionHandler
 ) : PlaceSelectionListener {
 
     override fun onPlaceSelected(place: Place) {
-        runBlocking {
-            withContext(Dispatchers.IO) {
-                navigationRequestManager.updateActiveNavigation(place.name!!, place.latLng?.latitude!!, place.latLng?.longitude!!)
-            }
-        }
-
-        val navController = fragment.findNavController()
-        navController.navigate(R.id.action_location_to_arrow)
+        handler.handlePlaceSelected(place.name!!, place.latLng?.latitude!!, place.latLng?.longitude!!)
     }
 
     override fun onError(p0: Status) {
